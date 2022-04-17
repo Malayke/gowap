@@ -108,7 +108,10 @@ type EmulationUserAgentMetadata struct {
 	// Brands (optional) ...
 	Brands []*EmulationUserAgentBrandVersion `json:"brands,omitempty"`
 
-	// FullVersion (optional) ...
+	// FullVersionList (optional) ...
+	FullVersionList []*EmulationUserAgentBrandVersion `json:"fullVersionList,omitempty"`
+
+	// FullVersion (deprecated) (optional) ...
 	FullVersion string `json:"fullVersion,omitempty"`
 
 	// Platform ...
@@ -218,6 +221,24 @@ func (m EmulationSetFocusEmulationEnabled) Call(c Client) error {
 	return call(m.ProtoReq(), m, nil, c)
 }
 
+// EmulationSetAutoDarkModeOverride (experimental) Automatically render all web contents using a dark theme.
+type EmulationSetAutoDarkModeOverride struct {
+
+	// Enabled (optional) Whether to enable or disable automatic dark mode.
+	// If not specified, any existing override will be cleared.
+	Enabled bool `json:"enabled,omitempty"`
+}
+
+// ProtoReq name
+func (m EmulationSetAutoDarkModeOverride) ProtoReq() string {
+	return "Emulation.setAutoDarkModeOverride"
+}
+
+// Call sends the request
+func (m EmulationSetAutoDarkModeOverride) Call(c Client) error {
+	return call(m.ProtoReq(), m, nil, c)
+}
+
 // EmulationSetCPUThrottlingRate (experimental) Enables CPU throttling to emulate slow CPUs.
 type EmulationSetCPUThrottlingRate struct {
 
@@ -271,19 +292,19 @@ type EmulationSetDeviceMetricsOverride struct {
 	Mobile bool `json:"mobile"`
 
 	// Scale (experimental) (optional) Scale to apply to resulting view image.
-	Scale float64 `json:"scale,omitempty"`
+	Scale *float64 `json:"scale,omitempty"`
 
 	// ScreenWidth (experimental) (optional) Overriding screen width value in pixels (minimum 0, maximum 10000000).
-	ScreenWidth int `json:"screenWidth,omitempty"`
+	ScreenWidth *int `json:"screenWidth,omitempty"`
 
 	// ScreenHeight (experimental) (optional) Overriding screen height value in pixels (minimum 0, maximum 10000000).
-	ScreenHeight int `json:"screenHeight,omitempty"`
+	ScreenHeight *int `json:"screenHeight,omitempty"`
 
 	// PositionX (experimental) (optional) Overriding view X position on screen in pixels (minimum 0, maximum 10000000).
-	PositionX int `json:"positionX,omitempty"`
+	PositionX *int `json:"positionX,omitempty"`
 
 	// PositionY (experimental) (optional) Overriding view Y position on screen in pixels (minimum 0, maximum 10000000).
-	PositionY int `json:"positionY,omitempty"`
+	PositionY *int `json:"positionY,omitempty"`
 
 	// DontSetVisibleSize (experimental) (optional) Do not set visible view size, rely upon explicit setVisibleSize call.
 	DontSetVisibleSize bool `json:"dontSetVisibleSize,omitempty"`
@@ -436,13 +457,13 @@ func (m EmulationSetEmulatedVisionDeficiency) Call(c Client) error {
 type EmulationSetGeolocationOverride struct {
 
 	// Latitude (optional) Mock latitude
-	Latitude float64 `json:"latitude,omitempty"`
+	Latitude *float64 `json:"latitude,omitempty"`
 
 	// Longitude (optional) Mock longitude
-	Longitude float64 `json:"longitude,omitempty"`
+	Longitude *float64 `json:"longitude,omitempty"`
 
 	// Accuracy (optional) Mock accuracy
-	Accuracy float64 `json:"accuracy,omitempty"`
+	Accuracy *float64 `json:"accuracy,omitempty"`
 }
 
 // ProtoReq name
@@ -537,7 +558,7 @@ type EmulationSetTouchEmulationEnabled struct {
 	Enabled bool `json:"enabled"`
 
 	// MaxTouchPoints (optional) Maximum touch points supported. Defaults to one.
-	MaxTouchPoints int `json:"maxTouchPoints,omitempty"`
+	MaxTouchPoints *int `json:"maxTouchPoints,omitempty"`
 }
 
 // ProtoReq name
@@ -559,15 +580,11 @@ type EmulationSetVirtualTimePolicy struct {
 
 	// Budget (optional) If set, after this many virtual milliseconds have elapsed virtual time will be paused and a
 	// virtualTimeBudgetExpired event is sent.
-	Budget float64 `json:"budget,omitempty"`
+	Budget *float64 `json:"budget,omitempty"`
 
 	// MaxVirtualTimeTaskStarvationCount (optional) If set this specifies the maximum number of tasks that can be run before virtual is forced
 	// forwards to prevent deadlock.
-	MaxVirtualTimeTaskStarvationCount int `json:"maxVirtualTimeTaskStarvationCount,omitempty"`
-
-	// WaitForNavigation (optional) If set the virtual time policy change should be deferred until any frame starts navigating.
-	// Note any previous deferred policy change is superseded.
-	WaitForNavigation bool `json:"waitForNavigation,omitempty"`
+	MaxVirtualTimeTaskStarvationCount *int `json:"maxVirtualTimeTaskStarvationCount,omitempty"`
 
 	// InitialVirtualTime (optional) If set, base::Time::Now will be overridden to initially return this value.
 	InitialVirtualTime TimeSinceEpoch `json:"initialVirtualTime,omitempty"`
@@ -678,6 +695,21 @@ func (m EmulationSetUserAgentOverride) ProtoReq() string { return "Emulation.set
 
 // Call sends the request
 func (m EmulationSetUserAgentOverride) Call(c Client) error {
+	return call(m.ProtoReq(), m, nil, c)
+}
+
+// EmulationSetAutomationOverride (experimental) Allows overriding the automation flag.
+type EmulationSetAutomationOverride struct {
+
+	// Enabled Whether the override should be enabled.
+	Enabled bool `json:"enabled"`
+}
+
+// ProtoReq name
+func (m EmulationSetAutomationOverride) ProtoReq() string { return "Emulation.setAutomationOverride" }
+
+// Call sends the request
+func (m EmulationSetAutomationOverride) Call(c Client) error {
 	return call(m.ProtoReq(), m, nil, c)
 }
 

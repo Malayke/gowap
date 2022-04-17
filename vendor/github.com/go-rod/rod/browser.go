@@ -48,6 +48,7 @@ type Browser struct {
 
 	defaultDevice devices.Device
 
+	controlURL  string
 	client      CDPClient
 	event       *goob.Observable // all the browser events from cdp client
 	targetsLock *sync.Mutex
@@ -59,12 +60,13 @@ type Browser struct {
 }
 
 // New creates a controller.
-// DefaultDevice is set to devices.LaptopWithMDPIScreen.Landescape() . You can use
-// NoDefaultDevice to disable it.
+// DefaultDevice to emulate is set to devices.LaptopWithMDPIScreen.Landescape(), it can make the actual view area
+// smaller than the browser window on headful mode, you can use NoDefaultDevice to disable it.
 func New() *Browser {
 	return (&Browser{
 		ctx:           context.Background(),
 		sleeper:       DefaultSleeper,
+		controlURL:    defaults.URL,
 		slowMotion:    defaults.Slow,
 		trace:         defaults.Trace,
 		monitor:       defaults.Monitor,
@@ -90,11 +92,7 @@ func (b *Browser) Incognito() (*Browser, error) {
 
 // ControlURL set the url to remote control browser.
 func (b *Browser) ControlURL(url string) *Browser {
-	if url == "" {
-		b.client = nil
-	} else {
-		b.client = cdp.New(url)
-	}
+	b.controlURL = url
 	return b
 }
 
@@ -128,7 +126,8 @@ func (b *Browser) Client(c CDPClient) *Browser {
 	return b
 }
 
-// DefaultDevice sets the default device for new page in the future. Default is devices.LaptopWithMDPIScreen .
+// DefaultDevice sets the default device for new page to emulate in the future.
+// Default is devices.LaptopWithMDPIScreen .
 // Set it to devices.Clear to disable it.
 func (b *Browser) DefaultDevice(d devices.Device) *Browser {
 	b.defaultDevice = d
@@ -144,7 +143,7 @@ func (b *Browser) NoDefaultDevice() *Browser {
 // If fails to connect, try to launch a local browser, if local browser not found try to download one.
 func (b *Browser) Connect() error {
 	if b.client == nil {
-		u := defaults.URL
+		u := b.controlURL
 		if u == "" {
 			var err error
 			u, err = launcher.New().Context(b.ctx).Launch()
@@ -152,26 +151,21 @@ func (b *Browser) Connect() error {
 				return err
 			}
 		}
-		b.client = cdp.New(u)
-	}
 
-	err := b.client.Connect(b.ctx)
-	if err != nil {
-		return err
+		c, err := cdp.StartWithURL(b.ctx, u, nil)
+		if err != nil {
+			return err
+		}
+		b.client = c
 	}
 
 	b.initEvents()
-
-	err = proto.TargetSetDiscoverTargets{Discover: true}.Call(b)
-	if err != nil {
-		return err
-	}
 
 	if b.monitor != "" {
 		launcher.Open(b.ServeMonitor(b.monitor))
 	}
 
-	return nil
+	return proto.TargetSetDiscoverTargets{Discover: true}.Call(b)
 }
 
 // Close the browser
@@ -249,12 +243,14 @@ func (b *Browser) Call(ctx context.Context, sessionID, methodName string, params
 
 // PageFromSession is used for low-level debugging
 func (b *Browser) PageFromSession(sessionID proto.TargetSessionID) *Page {
+	sessionCtx, cancel := context.WithCancel(b.ctx)
 	return &Page{
-		e:         b.e,
-		ctx:       b.ctx,
-		sleeper:   b.sleeper,
-		browser:   b,
-		SessionID: sessionID,
+		e:             b.e,
+		ctx:           sessionCtx,
+		sessionCancel: cancel,
+		sleeper:       b.sleeper,
+		browser:       b,
+		SessionID:     sessionID,
 	}
 }
 
@@ -276,17 +272,20 @@ func (b *Browser) PageFromTarget(targetID proto.TargetTargetID) (*Page, error) {
 		return nil, err
 	}
 
+	sessionCtx, cancel := context.WithCancel(b.ctx)
+
 	page = &Page{
-		e:           b.e,
-		ctx:         b.ctx,
-		sleeper:     b.sleeper,
-		browser:     b,
-		TargetID:    targetID,
-		SessionID:   session.SessionID,
-		FrameID:     proto.PageFrameID(targetID),
-		jsCtxLock:   &sync.Mutex{},
-		jsCtxID:     new(proto.RuntimeRemoteObjectID),
-		helpersLock: &sync.Mutex{},
+		e:             b.e,
+		ctx:           sessionCtx,
+		sessionCancel: cancel,
+		sleeper:       b.sleeper,
+		browser:       b,
+		TargetID:      targetID,
+		SessionID:     session.SessionID,
+		FrameID:       proto.PageFrameID(targetID),
+		jsCtxLock:     &sync.Mutex{},
+		jsCtxID:       new(proto.RuntimeRemoteObjectID),
+		helpersLock:   &sync.Mutex{},
 	}
 
 	page.root = page
@@ -302,6 +301,8 @@ func (b *Browser) PageFromTarget(targetID proto.TargetTargetID) (*Page, error) {
 	}
 
 	b.cachePage(page)
+
+	page.initEvents()
 
 	// If we don't enable it, it will cause a lot of unexpected browser behavior.
 	// Such as proto.PageAddScriptToEvaluateOnNewDocument won't work.
@@ -407,10 +408,9 @@ func (b *Browser) eachEvent(sessionID proto.TargetSessionID, callbacks ...interf
 
 // Event of the browser
 func (b *Browser) Event() <-chan *Message {
-	src := b.event.Subscribe()
+	src := b.event.Subscribe(b.ctx)
 	dst := make(chan *Message)
 	go func() {
-		defer b.event.Unsubscribe(src)
 		defer close(dst)
 		for {
 			select {
@@ -432,11 +432,11 @@ func (b *Browser) Event() <-chan *Message {
 }
 
 func (b *Browser) initEvents() {
-	b.event = goob.New()
+	b.event = goob.New(b.ctx)
+	event := b.client.Event()
 
 	go func() {
-		defer b.event.Close()
-		for e := range b.client.Event() {
+		for e := range event {
 			b.event.Publish(&Message{
 				SessionID: proto.TargetSessionID(e.SessionID),
 				Method:    e.Method,

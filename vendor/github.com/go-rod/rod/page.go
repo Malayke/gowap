@@ -13,6 +13,7 @@ import (
 	"github.com/go-rod/rod/lib/js"
 	"github.com/go-rod/rod/lib/proto"
 	"github.com/go-rod/rod/lib/utils"
+	"github.com/ysmood/goob"
 	"github.com/ysmood/gson"
 )
 
@@ -21,8 +22,9 @@ var _ proto.Client = &Page{}
 var _ proto.Contextable = &Page{}
 var _ proto.Sessionable = &Page{}
 
-// Page represents the webpage
-// We try to hold as less states as possible
+// Page represents the webpage.
+// We try to hold as less states as possible.
+// When a page is closed by Rod or not all the ongoing operations an events on it will abort.
 type Page struct {
 	// TargetID is a unique ID for a remote page.
 	// It's usually used in events sent from the browser to tell which page an event belongs to.
@@ -42,11 +44,15 @@ type Page struct {
 
 	ctx context.Context
 
+	// Used to abort all ongoing actions when a page closes.
+	sessionCancel func()
+
 	root *Page
 
 	sleeper func() utils.Sleeper
 
 	browser *Browser
+	event   *goob.Observable
 
 	// devices
 	Mouse    *Mouse
@@ -173,14 +179,14 @@ func (p *Page) Navigate(url string) error {
 // NavigateBack history.
 func (p *Page) NavigateBack() error {
 	// Not using cdp API because it doesn't work for iframe
-	_, err := p.Evaluate(Eval(`history.back()`).ByUser())
+	_, err := p.Evaluate(Eval(`() => history.back()`).ByUser())
 	return err
 }
 
 // NavigateForward history.
 func (p *Page) NavigateForward() error {
 	// Not using cdp API because it doesn't work for iframe
-	_, err := p.Evaluate(Eval(`history.forward()`).ByUser())
+	_, err := p.Evaluate(Eval(`() => history.forward()`).ByUser())
 	return err
 }
 
@@ -194,7 +200,7 @@ func (p *Page) Reload() error {
 	})
 
 	// Not using cdp API because it doesn't work for iframe
-	_, err := p.Evaluate(Eval(`location.reload()`).ByUser())
+	_, err := p.Evaluate(Eval(`() => location.reload()`).ByUser())
 	if err != nil {
 		return err
 	}
@@ -254,6 +260,14 @@ func (p *Page) SetViewport(params *proto.EmulationSetDeviceMetricsOverride) erro
 	return params.Call(p)
 }
 
+// SetDocumentContent sets the page document html content
+func (p *Page) SetDocumentContent(html string) error {
+	return proto.PageSetDocumentContent{
+		FrameID: p.FrameID,
+		HTML:    html,
+	}.Call(p)
+}
+
 // Emulate the device, such as iPhone9. If device is devices.Clear, it will clear the override.
 func (p *Page) Emulate(device devices.Device) error {
 	err := p.SetViewport(device.MetricsEmulation())
@@ -274,7 +288,7 @@ func (p *Page) StopLoading() error {
 	return proto.PageStopLoading{}.Call(p)
 }
 
-// Close tries to close page, running its beforeunload hooks, if any.
+// Close tries to close page, running its beforeunload hooks, if has any.
 func (p *Page) Close() error {
 	p.browser.targetsLock.Lock()
 	defer p.browser.targetsLock.Unlock()
@@ -356,8 +370,8 @@ func (p *Page) Screenshot(fullpage bool, req *proto.PageCaptureScreenshot) ([]by
 		oldView := proto.EmulationSetDeviceMetricsOverride{}
 		set := p.LoadState(&oldView)
 		view := oldView
-		view.Width = int(metrics.ContentSize.Width)
-		view.Height = int(metrics.ContentSize.Height)
+		view.Width = int(metrics.CSSContentSize.Width)
+		view.Height = int(metrics.CSSContentSize.Height)
 
 		err = p.SetViewport(&view)
 		if err != nil {
@@ -534,7 +548,7 @@ func (p *Page) WaitIdle(timeout time.Duration) (err error) {
 // Doc: https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame
 func (p *Page) WaitRepaint() error {
 	// we use root here because iframe doesn't trigger requestAnimationFrame
-	_, err := p.root.Eval(`new Promise(r => requestAnimationFrame(r))`)
+	_, err := p.root.Eval(`() => new Promise(r => requestAnimationFrame(r))`)
 	return err
 }
 
@@ -700,27 +714,50 @@ func (p *Page) Call(ctx context.Context, sessionID, methodName string, params in
 // Event of the page
 func (p *Page) Event() <-chan *Message {
 	dst := make(chan *Message)
-	p, cancel := p.WithCancel()
-	messages := p.browser.Context(p.ctx).Event()
+	s := p.event.Subscribe(p.ctx)
 
 	go func() {
 		defer close(dst)
-		defer cancel()
-		for m := range messages {
-			detached := proto.TargetDetachedFromTarget{}
-			if m.Load(&detached) && detached.SessionID == p.SessionID {
+		for {
+			select {
+			case <-p.ctx.Done():
 				return
-			}
-
-			if m.SessionID == p.SessionID {
+			case msg, ok := <-s:
+				if !ok {
+					return
+				}
 				select {
 				case <-p.ctx.Done():
 					return
-				case dst <- m:
+				case dst <- msg.(*Message):
 				}
 			}
 		}
 	}()
 
 	return dst
+}
+
+func (p *Page) initEvents() {
+	p.event = goob.New(p.ctx)
+	event := p.browser.Context(p.ctx).Event()
+
+	go func() {
+		for msg := range event {
+			detached := proto.TargetDetachedFromTarget{}
+			destroyed := proto.TargetTargetDestroyed{}
+
+			if (msg.Load(&detached) && detached.SessionID == p.SessionID) ||
+				(msg.Load(destroyed) && destroyed.TargetID == p.TargetID) {
+				p.sessionCancel()
+				return
+			}
+
+			if msg.SessionID != p.SessionID {
+				continue
+			}
+
+			p.event.Publish(msg)
+		}
+	}()
 }

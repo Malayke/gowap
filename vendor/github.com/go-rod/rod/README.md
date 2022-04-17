@@ -3,7 +3,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/go-rod/rod.svg)](https://pkg.go.dev/github.com/go-rod/rod)
 [![Discord Chat](https://img.shields.io/discord/719933559456006165.svg)][discord room]
 
-## [Documentation](https://go-rod.github.io/) | [API reference](https://pkg.go.dev/github.com/go-rod/rod?tab=doc) | [Management](https://github.com/orgs/go-rod/projects/1)
+## [Documentation](https://go-rod.github.io/) | [API reference](https://pkg.go.dev/github.com/go-rod/rod?tab=doc) | [Management](https://github.com/orgs/go-rod/projects/1) | [FAQ](https://go-rod.github.io/#/faq/README)
 
 Rod is a high-level driver directly based on [DevTools Protocol](https://chromedevtools.github.io/devtools-protocol).
 It's designed for web automation and scraping for both high-level and low-level use, senior developers can use the low-level packages and functions to easily
@@ -16,11 +16,11 @@ customize or build up their own version of Rod, the high-level functions are jus
 - Debugging friendly, auto input tracing, remote monitoring headless browser
 - Thread-safe for all operations
 - Automatically find or download [browser](lib/launcher)
-- Lightweight, no third-party dependencies, [CI](https://github.com/go-rod/rod/actions) tested on Linux, Mac, and Windows
 - High-level helpers like WaitStable, WaitRequestIdle, HijackRequests, WaitDownload, etc
 - Two-step WaitEvent design, never miss an event ([how it works](https://github.com/ysmood/goob))
 - Correctly handles nested iframes or shadow DOMs
 - No zombie browser process after the crash ([how it works](https://github.com/ysmood/leakless))
+- [CI](https://github.com/go-rod/rod/actions) enforced 100% test coverage
 
 ## Examples
 
@@ -44,7 +44,6 @@ Please read [How To Ask Questions The Smart Way](http://www.catb.org/~esr/faqs/s
 
 We use Github Projects to manage tasks, you can see the priority and progress of the issues [here](https://github.com/orgs/go-rod/projects/1).
 
-If you want to contribute code for this project please read the [Contributor Guide](.github/CONTRIBUTING.md).
+If you want to contribute please read the [Contributor Guide](.github/CONTRIBUTING.md).
 
 [discord room]: https://discord.gg/CpevuvY
-[中文文档]: https://go-rod.github.io/i18n/zh-CN

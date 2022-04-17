@@ -18,7 +18,7 @@ type ProfilerProfileNode struct {
 	CallFrame *RuntimeCallFrame `json:"callFrame"`
 
 	// HitCount (optional) Number of samples where this node was on top of the call stack.
-	HitCount int `json:"hitCount,omitempty"`
+	HitCount *int `json:"hitCount,omitempty"`
 
 	// Children (optional) Child node ids.
 	Children []int `json:"children,omitempty"`
@@ -128,29 +128,6 @@ type ProfilerScriptTypeProfile struct {
 
 	// Entries Type profile entries for parameters and return values of the functions in the script.
 	Entries []*ProfilerTypeProfileEntry `json:"entries"`
-}
-
-// ProfilerCounterInfo (experimental) Collected counter information.
-type ProfilerCounterInfo struct {
-
-	// Name Counter name.
-	Name string `json:"name"`
-
-	// Value Counter value.
-	Value int `json:"value"`
-}
-
-// ProfilerRuntimeCallCounterInfo (experimental) Runtime call counter information.
-type ProfilerRuntimeCallCounterInfo struct {
-
-	// Name Counter name.
-	Name string `json:"name"`
-
-	// Value Counter value.
-	Value float64 `json:"value"`
-
-	// Time Counter time in seconds.
-	Time float64 `json:"time"`
 }
 
 // ProfilerDisable ...
@@ -359,94 +336,6 @@ type ProfilerTakeTypeProfileResult struct {
 
 	// Result Type profile for all scripts since startTypeProfile() was turned on.
 	Result []*ProfilerScriptTypeProfile `json:"result"`
-}
-
-// ProfilerEnableCounters (experimental) Enable counters collection.
-type ProfilerEnableCounters struct {
-}
-
-// ProtoReq name
-func (m ProfilerEnableCounters) ProtoReq() string { return "Profiler.enableCounters" }
-
-// Call sends the request
-func (m ProfilerEnableCounters) Call(c Client) error {
-	return call(m.ProtoReq(), m, nil, c)
-}
-
-// ProfilerDisableCounters (experimental) Disable counters collection.
-type ProfilerDisableCounters struct {
-}
-
-// ProtoReq name
-func (m ProfilerDisableCounters) ProtoReq() string { return "Profiler.disableCounters" }
-
-// Call sends the request
-func (m ProfilerDisableCounters) Call(c Client) error {
-	return call(m.ProtoReq(), m, nil, c)
-}
-
-// ProfilerGetCounters (experimental) Retrieve counters.
-type ProfilerGetCounters struct {
-}
-
-// ProtoReq name
-func (m ProfilerGetCounters) ProtoReq() string { return "Profiler.getCounters" }
-
-// Call the request
-func (m ProfilerGetCounters) Call(c Client) (*ProfilerGetCountersResult, error) {
-	var res ProfilerGetCountersResult
-	return &res, call(m.ProtoReq(), m, &res, c)
-}
-
-// ProfilerGetCountersResult (experimental) Retrieve counters.
-type ProfilerGetCountersResult struct {
-
-	// Result Collected counters information.
-	Result []*ProfilerCounterInfo `json:"result"`
-}
-
-// ProfilerEnableRuntimeCallStats (experimental) Enable run time call stats collection.
-type ProfilerEnableRuntimeCallStats struct {
-}
-
-// ProtoReq name
-func (m ProfilerEnableRuntimeCallStats) ProtoReq() string { return "Profiler.enableRuntimeCallStats" }
-
-// Call sends the request
-func (m ProfilerEnableRuntimeCallStats) Call(c Client) error {
-	return call(m.ProtoReq(), m, nil, c)
-}
-
-// ProfilerDisableRuntimeCallStats (experimental) Disable run time call stats collection.
-type ProfilerDisableRuntimeCallStats struct {
-}
-
-// ProtoReq name
-func (m ProfilerDisableRuntimeCallStats) ProtoReq() string { return "Profiler.disableRuntimeCallStats" }
-
-// Call sends the request
-func (m ProfilerDisableRuntimeCallStats) Call(c Client) error {
-	return call(m.ProtoReq(), m, nil, c)
-}
-
-// ProfilerGetRuntimeCallStats (experimental) Retrieve run time call stats.
-type ProfilerGetRuntimeCallStats struct {
-}
-
-// ProtoReq name
-func (m ProfilerGetRuntimeCallStats) ProtoReq() string { return "Profiler.getRuntimeCallStats" }
-
-// Call the request
-func (m ProfilerGetRuntimeCallStats) Call(c Client) (*ProfilerGetRuntimeCallStatsResult, error) {
-	var res ProfilerGetRuntimeCallStatsResult
-	return &res, call(m.ProtoReq(), m, &res, c)
-}
-
-// ProfilerGetRuntimeCallStatsResult (experimental) Retrieve run time call stats.
-type ProfilerGetRuntimeCallStatsResult struct {
-
-	// Result Collected runtime call counter information.
-	Result []*ProfilerRuntimeCallCounterInfo `json:"result"`
 }
 
 // ProfilerConsoleProfileFinished ...

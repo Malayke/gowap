@@ -383,8 +383,9 @@ type NetworkSignedCertificateTimestamp struct {
 	// LogID Log ID.
 	LogID string `json:"logId"`
 
-	// Timestamp Issuance date.
-	Timestamp TimeSinceEpoch `json:"timestamp"`
+	// Timestamp Issuance date. Unlike TimeSinceEpoch, this contains the number of
+	// milliseconds since January 1, 1970, UTC, not the number of seconds.
+	Timestamp float64 `json:"timestamp"`
 
 	// HashAlgorithm Hash algorithm.
 	HashAlgorithm string `json:"hashAlgorithm"`
@@ -555,6 +556,12 @@ const (
 	// NetworkCorsErrorPreflightInvalidAllowExternal enum const
 	NetworkCorsErrorPreflightInvalidAllowExternal NetworkCorsError = "PreflightInvalidAllowExternal"
 
+	// NetworkCorsErrorPreflightMissingAllowPrivateNetwork enum const
+	NetworkCorsErrorPreflightMissingAllowPrivateNetwork NetworkCorsError = "PreflightMissingAllowPrivateNetwork"
+
+	// NetworkCorsErrorPreflightInvalidAllowPrivateNetwork enum const
+	NetworkCorsErrorPreflightInvalidAllowPrivateNetwork NetworkCorsError = "PreflightInvalidAllowPrivateNetwork"
+
 	// NetworkCorsErrorInvalidAllowMethodsPreflightResponse enum const
 	NetworkCorsErrorInvalidAllowMethodsPreflightResponse NetworkCorsError = "InvalidAllowMethodsPreflightResponse"
 
@@ -572,6 +579,12 @@ const (
 
 	// NetworkCorsErrorInsecurePrivateNetwork enum const
 	NetworkCorsErrorInsecurePrivateNetwork NetworkCorsError = "InsecurePrivateNetwork"
+
+	// NetworkCorsErrorInvalidPrivateNetworkAccess enum const
+	NetworkCorsErrorInvalidPrivateNetworkAccess NetworkCorsError = "InvalidPrivateNetworkAccess"
+
+	// NetworkCorsErrorUnexpectedPrivateNetworkAccess enum const
+	NetworkCorsErrorUnexpectedPrivateNetworkAccess NetworkCorsError = "UnexpectedPrivateNetworkAccess"
 
 	// NetworkCorsErrorNoCorsRedirectModeNotFollow enum const
 	NetworkCorsErrorNoCorsRedirectModeNotFollow NetworkCorsError = "NoCorsRedirectModeNotFollow"
@@ -661,7 +674,7 @@ type NetworkResponse struct {
 	// Headers HTTP response headers.
 	Headers NetworkHeaders `json:"headers"`
 
-	// HeadersText (optional) HTTP response headers text.
+	// HeadersText (deprecated) (optional) HTTP response headers text. This has been replaced by the headers in Network.responseReceivedExtraInfo.
 	HeadersText string `json:"headersText,omitempty"`
 
 	// MIMEType Resource mimeType as determined by the browser.
@@ -670,7 +683,7 @@ type NetworkResponse struct {
 	// RequestHeaders (optional) Refined HTTP request headers that were actually transmitted over the network.
 	RequestHeaders NetworkHeaders `json:"requestHeaders,omitempty"`
 
-	// RequestHeadersText (optional) HTTP request headers text.
+	// RequestHeadersText (deprecated) (optional) HTTP request headers text. This has been replaced by the headers in Network.requestWillBeSentExtraInfo.
 	RequestHeadersText string `json:"requestHeadersText,omitempty"`
 
 	// ConnectionReused Specifies whether physical connection was actually reused for this request.
@@ -683,7 +696,7 @@ type NetworkResponse struct {
 	RemoteIPAddress string `json:"remoteIPAddress,omitempty"`
 
 	// RemotePort (optional) Remote port.
-	RemotePort int `json:"remotePort,omitempty"`
+	RemotePort *int `json:"remotePort,omitempty"`
 
 	// FromDiskCache (optional) Specifies that the request was served from the disk cache.
 	FromDiskCache bool `json:"fromDiskCache,omitempty"`
@@ -816,11 +829,11 @@ type NetworkInitiator struct {
 
 	// LineNumber (optional) Initiator line number, set for Parser type or for Script type (when script is importing
 	// module) (0-based).
-	LineNumber float64 `json:"lineNumber,omitempty"`
+	LineNumber *float64 `json:"lineNumber,omitempty"`
 
 	// ColumnNumber (optional) Initiator column number, set for Parser type or for Script type (when script is importing
 	// module) (0-based).
-	ColumnNumber float64 `json:"columnNumber,omitempty"`
+	ColumnNumber *float64 `json:"columnNumber,omitempty"`
 
 	// RequestID (optional) Set if another request triggered this request (e.g. preflight).
 	RequestID NetworkRequestID `json:"requestId,omitempty"`
@@ -872,6 +885,13 @@ type NetworkCookie struct {
 	// An unspecified port value allows protocol clients to emulate legacy cookie scope for the port.
 	// This is a temporary ability and it will be removed in the future.
 	SourcePort int `json:"sourcePort"`
+
+	// PartitionKey (experimental) (optional) Cookie partition key. The site of the top-level URL the browser was visiting at the start
+	// of the request to the endpoint that set the cookie.
+	PartitionKey string `json:"partitionKey,omitempty"`
+
+	// PartitionKeyOpaque (experimental) (optional) True if cookie partition key is opaque.
+	PartitionKeyOpaque bool `json:"partitionKeyOpaque,omitempty"`
 }
 
 // NetworkSetCookieBlockedReason (experimental) Types of reasons why a cookie may not be stored from a response.
@@ -928,6 +948,9 @@ const (
 
 	// NetworkSetCookieBlockedReasonSamePartyConflictsWithOtherAttributes enum const
 	NetworkSetCookieBlockedReasonSamePartyConflictsWithOtherAttributes NetworkSetCookieBlockedReason = "SamePartyConflictsWithOtherAttributes"
+
+	// NetworkSetCookieBlockedReasonNameValuePairExceedsMaxSize enum const
+	NetworkSetCookieBlockedReasonNameValuePairExceedsMaxSize NetworkSetCookieBlockedReason = "NameValuePairExceedsMaxSize"
 )
 
 // NetworkCookieBlockedReason (experimental) Types of reasons why a cookie may not be sent with a request.
@@ -972,6 +995,9 @@ const (
 
 	// NetworkCookieBlockedReasonSamePartyFromCrossPartyContext enum const
 	NetworkCookieBlockedReasonSamePartyFromCrossPartyContext NetworkCookieBlockedReason = "SamePartyFromCrossPartyContext"
+
+	// NetworkCookieBlockedReasonNameValuePairExceedsMaxSize enum const
+	NetworkCookieBlockedReasonNameValuePairExceedsMaxSize NetworkCookieBlockedReason = "NameValuePairExceedsMaxSize"
 )
 
 // NetworkBlockedSetCookieWithReason (experimental) A cookie which was not stored from a response with the corresponding reason.
@@ -1043,7 +1069,12 @@ type NetworkCookieParam struct {
 	// SourcePort (experimental) (optional) Cookie source port. Valid values are {-1, [1, 65535]}, -1 indicates an unspecified port.
 	// An unspecified port value allows protocol clients to emulate legacy cookie scope for the port.
 	// This is a temporary ability and it will be removed in the future.
-	SourcePort int `json:"sourcePort,omitempty"`
+	SourcePort *int `json:"sourcePort,omitempty"`
+
+	// PartitionKey (experimental) (optional) Cookie partition key. The site of the top-level URL the browser was visiting at the start
+	// of the request to the endpoint that set the cookie.
+	// If not set, the cookie will be set as not partitioned.
+	PartitionKey string `json:"partitionKey,omitempty"`
 }
 
 // NetworkAuthChallengeSource enum
@@ -1212,7 +1243,7 @@ type NetworkSignedExchangeError struct {
 	Message string `json:"message"`
 
 	// SignatureIndex (optional) The index of the signature which caused the error.
-	SignatureIndex int `json:"signatureIndex,omitempty"`
+	SignatureIndex *int `json:"signatureIndex,omitempty"`
 
 	// ErrorField (optional) The field which caused the error.
 	ErrorField NetworkSignedExchangeErrorField `json:"errorField,omitempty"`
@@ -1260,6 +1291,12 @@ const (
 
 	// NetworkPrivateNetworkRequestPolicyWarnFromInsecureToMorePrivate enum const
 	NetworkPrivateNetworkRequestPolicyWarnFromInsecureToMorePrivate NetworkPrivateNetworkRequestPolicy = "WarnFromInsecureToMorePrivate"
+
+	// NetworkPrivateNetworkRequestPolicyPreflightBlock enum const
+	NetworkPrivateNetworkRequestPolicyPreflightBlock NetworkPrivateNetworkRequestPolicy = "PreflightBlock"
+
+	// NetworkPrivateNetworkRequestPolicyPreflightWarn enum const
+	NetworkPrivateNetworkRequestPolicyPreflightWarn NetworkPrivateNetworkRequestPolicy = "PreflightWarn"
 )
 
 // NetworkIPAddressSpace (experimental) ...
@@ -1278,6 +1315,15 @@ const (
 	// NetworkIPAddressSpaceUnknown enum const
 	NetworkIPAddressSpaceUnknown NetworkIPAddressSpace = "Unknown"
 )
+
+// NetworkConnectTiming (experimental) ...
+type NetworkConnectTiming struct {
+
+	// RequestTime Timing's requestTime is a baseline in seconds, while the other numbers are ticks in
+	// milliseconds relatively to this requestTime. Matches ResourceTiming's requestTime for
+	// the same request (but not for redirected requests).
+	RequestTime float64 `json:"requestTime"`
+}
 
 // NetworkClientSecurityState (experimental) ...
 type NetworkClientSecurityState struct {
@@ -1307,6 +1353,9 @@ const (
 
 	// NetworkCrossOriginOpenerPolicyValueSameOriginPlusCoep enum const
 	NetworkCrossOriginOpenerPolicyValueSameOriginPlusCoep NetworkCrossOriginOpenerPolicyValue = "SameOriginPlusCoep"
+
+	// NetworkCrossOriginOpenerPolicyValueSameOriginAllowPopupsPlusCoep enum const
+	NetworkCrossOriginOpenerPolicyValueSameOriginAllowPopupsPlusCoep NetworkCrossOriginOpenerPolicyValue = "SameOriginAllowPopupsPlusCoep"
 )
 
 // NetworkCrossOriginOpenerPolicyStatus (experimental) ...
@@ -1365,6 +1414,67 @@ type NetworkSecurityIsolationStatus struct {
 	Coep *NetworkCrossOriginEmbedderPolicyStatus `json:"coep,omitempty"`
 }
 
+// NetworkReportStatus (experimental) The status of a Reporting API report.
+type NetworkReportStatus string
+
+const (
+	// NetworkReportStatusQueued enum const
+	NetworkReportStatusQueued NetworkReportStatus = "Queued"
+
+	// NetworkReportStatusPending enum const
+	NetworkReportStatusPending NetworkReportStatus = "Pending"
+
+	// NetworkReportStatusMarkedForRemoval enum const
+	NetworkReportStatusMarkedForRemoval NetworkReportStatus = "MarkedForRemoval"
+
+	// NetworkReportStatusSuccess enum const
+	NetworkReportStatusSuccess NetworkReportStatus = "Success"
+)
+
+// NetworkReportID (experimental) ...
+type NetworkReportID string
+
+// NetworkReportingAPIReport (experimental) An object representing a report generated by the Reporting API.
+type NetworkReportingAPIReport struct {
+
+	// ID ...
+	ID NetworkReportID `json:"id"`
+
+	// InitiatorURL The URL of the document that triggered the report.
+	InitiatorURL string `json:"initiatorUrl"`
+
+	// Destination The name of the endpoint group that should be used to deliver the report.
+	Destination string `json:"destination"`
+
+	// Type The type of the report (specifies the set of data that is contained in the report body).
+	Type string `json:"type"`
+
+	// Timestamp When the report was generated.
+	Timestamp TimeSinceEpoch `json:"timestamp"`
+
+	// Depth How many uploads deep the related request was.
+	Depth int `json:"depth"`
+
+	// CompletedAttempts The number of delivery attempts made so far, not including an active attempt.
+	CompletedAttempts int `json:"completedAttempts"`
+
+	// Body ...
+	Body map[string]gson.JSON `json:"body"`
+
+	// Status ...
+	Status NetworkReportStatus `json:"status"`
+}
+
+// NetworkReportingAPIEndpoint (experimental) ...
+type NetworkReportingAPIEndpoint struct {
+
+	// URL The URL of the endpoint to which reports may be delivered.
+	URL string `json:"url"`
+
+	// GroupName Name of the endpoint group.
+	GroupName string `json:"groupName"`
+}
+
 // NetworkLoadNetworkResourcePageResult (experimental) An object providing the result of a network resource load.
 type NetworkLoadNetworkResourcePageResult struct {
 
@@ -1372,13 +1482,13 @@ type NetworkLoadNetworkResourcePageResult struct {
 	Success bool `json:"success"`
 
 	// NetError (optional) Optional values used for error reporting.
-	NetError float64 `json:"netError,omitempty"`
+	NetError *float64 `json:"netError,omitempty"`
 
 	// NetErrorName (optional) ...
 	NetErrorName string `json:"netErrorName,omitempty"`
 
 	// HTTPStatusCode (optional) ...
-	HTTPStatusCode float64 `json:"httpStatusCode,omitempty"`
+	HTTPStatusCode *float64 `json:"httpStatusCode,omitempty"`
 
 	// Stream (optional) If successful, one of the following two fields holds the result.
 	Stream IOStreamHandle `json:"stream,omitempty"`
@@ -1629,13 +1739,13 @@ func (m NetworkEmulateNetworkConditions) Call(c Client) error {
 type NetworkEnable struct {
 
 	// MaxTotalBufferSize (experimental) (optional) Buffer size in bytes to use when preserving network payloads (XHRs, etc).
-	MaxTotalBufferSize int `json:"maxTotalBufferSize,omitempty"`
+	MaxTotalBufferSize *int `json:"maxTotalBufferSize,omitempty"`
 
 	// MaxResourceBufferSize (experimental) (optional) Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc).
-	MaxResourceBufferSize int `json:"maxResourceBufferSize,omitempty"`
+	MaxResourceBufferSize *int `json:"maxResourceBufferSize,omitempty"`
 
 	// MaxPostDataSize (optional) Longest post body size (in bytes) that would be included in requestWillBeSent notification
-	MaxPostDataSize int `json:"maxPostDataSize,omitempty"`
+	MaxPostDataSize *int `json:"maxPostDataSize,omitempty"`
 }
 
 // ProtoReq name
@@ -1963,7 +2073,12 @@ type NetworkSetCookie struct {
 	// SourcePort (experimental) (optional) Cookie source port. Valid values are {-1, [1, 65535]}, -1 indicates an unspecified port.
 	// An unspecified port value allows protocol clients to emulate legacy cookie scope for the port.
 	// This is a temporary ability and it will be removed in the future.
-	SourcePort int `json:"sourcePort,omitempty"`
+	SourcePort *int `json:"sourcePort,omitempty"`
+
+	// PartitionKey (experimental) (optional) Cookie partition key. The site of the top-level URL the browser was visiting at the start
+	// of the request to the endpoint that set the cookie.
+	// If not set, the cookie will be set as not partitioned.
+	PartitionKey string `json:"partitionKey,omitempty"`
 }
 
 // ProtoReq name
@@ -2093,11 +2208,28 @@ type NetworkGetSecurityIsolationStatusResult struct {
 	Status *NetworkSecurityIsolationStatus `json:"status"`
 }
 
+// NetworkEnableReportingAPI (experimental) Enables tracking for the Reporting API, events generated by the Reporting API will now be delivered to the client.
+// Enabling triggers 'reportingApiReportAdded' for all existing reports.
+type NetworkEnableReportingAPI struct {
+
+	// Enable Whether to enable or disable events for the Reporting API
+	Enable bool `json:"enable"`
+}
+
+// ProtoReq name
+func (m NetworkEnableReportingAPI) ProtoReq() string { return "Network.enableReportingApi" }
+
+// Call sends the request
+func (m NetworkEnableReportingAPI) Call(c Client) error {
+	return call(m.ProtoReq(), m, nil, c)
+}
+
 // NetworkLoadNetworkResource (experimental) Fetches the resource and returns the content.
 type NetworkLoadNetworkResource struct {
 
-	// FrameID Frame id to get the resource for.
-	FrameID PageFrameID `json:"frameId"`
+	// FrameID (optional) Frame id to get the resource for. Mandatory for frame targets, and
+	// should be omitted for worker targets.
+	FrameID PageFrameID `json:"frameId,omitempty"`
 
 	// URL URL of the resource to get content for.
 	URL string `json:"url"`
@@ -2258,7 +2390,7 @@ type NetworkRequestIntercepted struct {
 
 	// ResponseStatusCode (optional) Response code if intercepted at response stage or if redirect occurred while intercepting
 	// request or auth retry occurred.
-	ResponseStatusCode int `json:"responseStatusCode,omitempty"`
+	ResponseStatusCode *int `json:"responseStatusCode,omitempty"`
 
 	// ResponseHeaders (optional) Response headers if intercepted at the response stage or if redirect occurred while
 	// intercepting request or auth retry occurred.
@@ -2309,6 +2441,11 @@ type NetworkRequestWillBeSent struct {
 
 	// Initiator Request initiator.
 	Initiator *NetworkInitiator `json:"initiator"`
+
+	// RedirectHasExtraInfo (experimental) In the case that redirectResponse is populated, this flag indicates whether
+	// requestWillBeSentExtraInfo and responseReceivedExtraInfo events will be or were emitted
+	// for the request which was just redirected.
+	RedirectHasExtraInfo bool `json:"redirectHasExtraInfo"`
 
 	// RedirectResponse (optional) Redirect response data.
 	RedirectResponse *NetworkResponse `json:"redirectResponse,omitempty"`
@@ -2378,6 +2515,10 @@ type NetworkResponseReceived struct {
 
 	// Response Response data.
 	Response *NetworkResponse `json:"response"`
+
+	// HasExtraInfo (experimental) Indicates whether requestWillBeSentExtraInfo and responseReceivedExtraInfo events will be
+	// or were emitted for this request.
+	HasExtraInfo bool `json:"hasExtraInfo"`
 
 	// FrameID (optional) Frame identifier.
 	FrameID PageFrameID `json:"frameId,omitempty"`
@@ -2581,6 +2722,9 @@ type NetworkRequestWillBeSentExtraInfo struct {
 	// Headers Raw request headers as they will be sent over the wire.
 	Headers NetworkHeaders `json:"headers"`
 
+	// ConnectTiming (experimental) Connection timing information for the request.
+	ConnectTiming *NetworkConnectTiming `json:"connectTiming"`
+
 	// ClientSecurityState (optional) The client security state set for the request.
 	ClientSecurityState *NetworkClientSecurityState `json:"clientSecurityState,omitempty"`
 }
@@ -2609,6 +2753,11 @@ type NetworkResponseReceivedExtraInfo struct {
 	// ResourceIPAddressSpace The IP address space of the resource. The address space can only be determined once the transport
 	// established the connection, so we can't send it in `requestWillBeSentExtraInfo`.
 	ResourceIPAddressSpace NetworkIPAddressSpace `json:"resourceIPAddressSpace"`
+
+	// StatusCode The status code of the response. This is useful in cases the request failed and no responseReceived
+	// event is triggered, which is the case for, e.g., CORS errors. This is also the correct status code
+	// for cached requests, where the status in responseReceived is a 200 and this will be 304.
+	StatusCode int `json:"statusCode"`
 
 	// HeadersText (optional) Raw response header text as it was received over the wire. The raw text may not always be
 	// available, such as in the case of HTTP/2 or QUIC.
@@ -2680,7 +2829,7 @@ type NetworkTrustTokenOperationDone struct {
 	IssuerOrigin string `json:"issuerOrigin,omitempty"`
 
 	// IssuedTokenCount (optional) The number of obtained Trust Tokens on a successful "Issuance" operation.
-	IssuedTokenCount int `json:"issuedTokenCount,omitempty"`
+	IssuedTokenCount *int `json:"issuedTokenCount,omitempty"`
 }
 
 // ProtoEvent name
@@ -2761,4 +2910,44 @@ type NetworkSubresourceWebBundleInnerResponseError struct {
 // ProtoEvent name
 func (evt NetworkSubresourceWebBundleInnerResponseError) ProtoEvent() string {
 	return "Network.subresourceWebBundleInnerResponseError"
+}
+
+// NetworkReportingAPIReportAdded (experimental) Is sent whenever a new report is added.
+// And after 'enableReportingApi' for all existing reports.
+type NetworkReportingAPIReportAdded struct {
+
+	// Report ...
+	Report *NetworkReportingAPIReport `json:"report"`
+}
+
+// ProtoEvent name
+func (evt NetworkReportingAPIReportAdded) ProtoEvent() string {
+	return "Network.reportingApiReportAdded"
+}
+
+// NetworkReportingAPIReportUpdated (experimental) ...
+type NetworkReportingAPIReportUpdated struct {
+
+	// Report ...
+	Report *NetworkReportingAPIReport `json:"report"`
+}
+
+// ProtoEvent name
+func (evt NetworkReportingAPIReportUpdated) ProtoEvent() string {
+	return "Network.reportingApiReportUpdated"
+}
+
+// NetworkReportingAPIEndpointsChangedForOrigin (experimental) ...
+type NetworkReportingAPIEndpointsChangedForOrigin struct {
+
+	// Origin Origin of the document(s) which configured the endpoints.
+	Origin string `json:"origin"`
+
+	// Endpoints ...
+	Endpoints []*NetworkReportingAPIEndpoint `json:"endpoints"`
+}
+
+// ProtoEvent name
+func (evt NetworkReportingAPIEndpointsChangedForOrigin) ProtoEvent() string {
+	return "Network.reportingApiEndpointsChangedForOrigin"
 }

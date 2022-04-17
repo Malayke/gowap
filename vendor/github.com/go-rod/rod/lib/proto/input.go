@@ -19,16 +19,16 @@ type InputTouchPoint struct {
 	Y float64 `json:"y"`
 
 	// RadiusX (optional) X radius of the touch area (default: 1.0).
-	RadiusX float64 `json:"radiusX,omitempty"`
+	RadiusX *float64 `json:"radiusX,omitempty"`
 
 	// RadiusY (optional) Y radius of the touch area (default: 1.0).
-	RadiusY float64 `json:"radiusY,omitempty"`
+	RadiusY *float64 `json:"radiusY,omitempty"`
 
 	// RotationAngle (optional) Rotation angle (default: 0.0).
-	RotationAngle float64 `json:"rotationAngle,omitempty"`
+	RotationAngle *float64 `json:"rotationAngle,omitempty"`
 
 	// Force (optional) Force (default: 1.0).
-	Force float64 `json:"force,omitempty"`
+	Force *float64 `json:"force,omitempty"`
 
 	// TangentialPressure (experimental) (optional) The normalized tangential pressure, which has a range of [-1,1] (default: 0).
 	TangentialPressure float64 `json:"tangentialPressure,omitempty"`
@@ -43,7 +43,7 @@ type InputTouchPoint struct {
 	Twist int `json:"twist,omitempty"`
 
 	// ID (optional) Identifier used to track touch sources between events, must be unique within an event.
-	ID float64 `json:"id,omitempty"`
+	ID *float64 `json:"id,omitempty"`
 }
 
 // InputGestureSourceType (experimental) ...
@@ -106,6 +106,9 @@ type InputDragData struct {
 
 	// Items ...
 	Items []*InputDragDataItem `json:"items"`
+
+	// Files (optional) List of filenames that should be included when dropping
+	Files []string `json:"files,omitempty"`
 
 	// DragOperationsMask Bit field representing allowed drag operations. Copy = 1, Link = 2, Move = 16
 	DragOperationsMask int `json:"dragOperationsMask"`
@@ -222,11 +225,11 @@ type InputDispatchKeyEvent struct {
 
 	// Location (optional) Whether the event was from the left or right side of the keyboard. 1=Left, 2=Right (default:
 	// 0).
-	Location int `json:"location,omitempty"`
+	Location *int `json:"location,omitempty"`
 
 	// Commands (experimental) (optional) Editing commands to send with the key event (e.g., 'selectAll') (default: []).
 	// These are related to but not equal the command names used in `document.execCommand` and NSStandardKeyBindingResponding.
-	// See https://source.chromium.org/chromium/chromium/src/+/master:third_party/blink/renderer/core/editing/commands/editor_command_names.h for valid command names.
+	// See https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/editing/commands/editor_command_names.h for valid command names.
 	Commands []string `json:"commands,omitempty"`
 }
 
@@ -251,6 +254,35 @@ func (m InputInsertText) ProtoReq() string { return "Input.insertText" }
 
 // Call sends the request
 func (m InputInsertText) Call(c Client) error {
+	return call(m.ProtoReq(), m, nil, c)
+}
+
+// InputImeSetComposition (experimental) This method sets the current candidate text for ime.
+// Use imeCommitComposition to commit the final text.
+// Use imeSetComposition with empty string as text to cancel composition.
+type InputImeSetComposition struct {
+
+	// Text The text to insert
+	Text string `json:"text"`
+
+	// SelectionStart selection start
+	SelectionStart int `json:"selectionStart"`
+
+	// SelectionEnd selection end
+	SelectionEnd int `json:"selectionEnd"`
+
+	// ReplacementStart (optional) replacement start
+	ReplacementStart *int `json:"replacementStart,omitempty"`
+
+	// ReplacementEnd (optional) replacement end
+	ReplacementEnd *int `json:"replacementEnd,omitempty"`
+}
+
+// ProtoReq name
+func (m InputImeSetComposition) ProtoReq() string { return "Input.imeSetComposition" }
+
+// Call sends the request
+func (m InputImeSetComposition) Call(c Client) error {
 	return call(m.ProtoReq(), m, nil, c)
 }
 
@@ -307,7 +339,7 @@ type InputDispatchMouseEvent struct {
 
 	// Buttons (optional) A number indicating which buttons are pressed on the mouse when a mouse event is triggered.
 	// Left=1, Right=2, Middle=4, Back=8, Forward=16, None=0.
-	Buttons int `json:"buttons,omitempty"`
+	Buttons *int `json:"buttons,omitempty"`
 
 	// ClickCount (optional) Number of times the mouse button was clicked (default: 0).
 	ClickCount int `json:"clickCount,omitempty"`
@@ -327,11 +359,11 @@ type InputDispatchMouseEvent struct {
 	// Twist (experimental) (optional) The clockwise rotation of a pen stylus around its own major axis, in degrees in the range [0,359] (default: 0).
 	Twist int `json:"twist,omitempty"`
 
-	// DeltaX (optional) X delta in CSS pixels for mouse wheel event (default: 0).
-	DeltaX float64 `json:"deltaX,omitempty"`
+	// DeltaX X delta in CSS pixels for mouse wheel event (default: 0).
+	DeltaX float64 `json:"deltaX"`
 
-	// DeltaY (optional) Y delta in CSS pixels for mouse wheel event (default: 0).
-	DeltaY float64 `json:"deltaY,omitempty"`
+	// DeltaY Y delta in CSS pixels for mouse wheel event (default: 0).
+	DeltaY float64 `json:"deltaY"`
 
 	// PointerType (optional) Pointer type (default: "mouse").
 	PointerType InputDispatchMouseEventPointerType `json:"pointerType,omitempty"`
@@ -491,7 +523,7 @@ type InputSynthesizePinchGesture struct {
 	ScaleFactor float64 `json:"scaleFactor"`
 
 	// RelativeSpeed (optional) Relative pointer speed in pixels per second (default: 800).
-	RelativeSpeed int `json:"relativeSpeed,omitempty"`
+	RelativeSpeed *int `json:"relativeSpeed,omitempty"`
 
 	// GestureSourceType (optional) Which type of input events to be generated (default: 'default', which queries the platform
 	// for the preferred input type).
@@ -516,24 +548,24 @@ type InputSynthesizeScrollGesture struct {
 	Y float64 `json:"y"`
 
 	// XDistance (optional) The distance to scroll along the X axis (positive to scroll left).
-	XDistance float64 `json:"xDistance,omitempty"`
+	XDistance *float64 `json:"xDistance,omitempty"`
 
 	// YDistance (optional) The distance to scroll along the Y axis (positive to scroll up).
-	YDistance float64 `json:"yDistance,omitempty"`
+	YDistance *float64 `json:"yDistance,omitempty"`
 
 	// XOverscroll (optional) The number of additional pixels to scroll back along the X axis, in addition to the given
 	// distance.
-	XOverscroll float64 `json:"xOverscroll,omitempty"`
+	XOverscroll *float64 `json:"xOverscroll,omitempty"`
 
 	// YOverscroll (optional) The number of additional pixels to scroll back along the Y axis, in addition to the given
 	// distance.
-	YOverscroll float64 `json:"yOverscroll,omitempty"`
+	YOverscroll *float64 `json:"yOverscroll,omitempty"`
 
 	// PreventFling (optional) Prevent fling (default: true).
 	PreventFling bool `json:"preventFling,omitempty"`
 
 	// Speed (optional) Swipe speed in pixels per second (default: 800).
-	Speed int `json:"speed,omitempty"`
+	Speed *int `json:"speed,omitempty"`
 
 	// GestureSourceType (optional) Which type of input events to be generated (default: 'default', which queries the platform
 	// for the preferred input type).
@@ -543,7 +575,7 @@ type InputSynthesizeScrollGesture struct {
 	RepeatCount int `json:"repeatCount,omitempty"`
 
 	// RepeatDelayMs (optional) The number of milliseconds delay between each repeat. (default: 250).
-	RepeatDelayMs int `json:"repeatDelayMs,omitempty"`
+	RepeatDelayMs *int `json:"repeatDelayMs,omitempty"`
 
 	// InteractionMarkerName (optional) The name of the interaction markers to generate, if not empty (default: "").
 	InteractionMarkerName string `json:"interactionMarkerName,omitempty"`
@@ -567,10 +599,10 @@ type InputSynthesizeTapGesture struct {
 	Y float64 `json:"y"`
 
 	// Duration (optional) Duration between touchdown and touchup events in ms (default: 50).
-	Duration int `json:"duration,omitempty"`
+	Duration *int `json:"duration,omitempty"`
 
 	// TapCount (optional) Number of times to perform the tap (e.g. 2 for double tap, default: 1).
-	TapCount int `json:"tapCount,omitempty"`
+	TapCount *int `json:"tapCount,omitempty"`
 
 	// GestureSourceType (optional) Which type of input events to be generated (default: 'default', which queries the platform
 	// for the preferred input type).

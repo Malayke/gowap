@@ -245,6 +245,9 @@ const (
 	// OverlayColorFormatHsl enum const
 	OverlayColorFormatHsl OverlayColorFormat = "hsl"
 
+	// OverlayColorFormatHwb enum const
+	OverlayColorFormatHwb OverlayColorFormat = "hwb"
+
 	// OverlayColorFormatHex enum const
 	OverlayColorFormatHex OverlayColorFormat = "hex"
 )
@@ -321,8 +324,34 @@ type OverlayContainerQueryHighlightConfig struct {
 // OverlayContainerQueryContainerHighlightConfig ...
 type OverlayContainerQueryContainerHighlightConfig struct {
 
-	// ContainerBorder (optional) The style of the container border
+	// ContainerBorder (optional) The style of the container border.
 	ContainerBorder *OverlayLineStyle `json:"containerBorder,omitempty"`
+
+	// DescendantBorder (optional) The style of the descendants' borders.
+	DescendantBorder *OverlayLineStyle `json:"descendantBorder,omitempty"`
+}
+
+// OverlayIsolatedElementHighlightConfig ...
+type OverlayIsolatedElementHighlightConfig struct {
+
+	// IsolationModeHighlightConfig A descriptor for the highlight appearance of an element in isolation mode.
+	IsolationModeHighlightConfig *OverlayIsolationModeHighlightConfig `json:"isolationModeHighlightConfig"`
+
+	// NodeID Identifier of the isolated element to highlight.
+	NodeID DOMNodeID `json:"nodeId"`
+}
+
+// OverlayIsolationModeHighlightConfig ...
+type OverlayIsolationModeHighlightConfig struct {
+
+	// ResizerColor (optional) The fill color of the resizers (default: transparent).
+	ResizerColor *DOMRGBA `json:"resizerColor,omitempty"`
+
+	// ResizerHandleColor (optional) The fill color for resizer handles (default: transparent).
+	ResizerHandleColor *DOMRGBA `json:"resizerHandleColor,omitempty"`
+
+	// MaskColor (optional) The fill color for the mask covering non-isolated elements (default: transparent).
+	MaskColor *DOMRGBA `json:"maskColor,omitempty"`
 }
 
 // OverlayInspectMode ...
@@ -791,7 +820,7 @@ func (m OverlaySetShowScrollBottleneckRects) Call(c Client) error {
 	return call(m.ProtoReq(), m, nil, c)
 }
 
-// OverlaySetShowHitTestBorders Requests that backend shows hit-test borders on layers
+// OverlaySetShowHitTestBorders (deprecated) Deprecated, no longer has any effect.
 type OverlaySetShowHitTestBorders struct {
 
 	// Show True for showing hit-test borders
@@ -850,6 +879,21 @@ func (m OverlaySetShowHinge) ProtoReq() string { return "Overlay.setShowHinge" }
 
 // Call sends the request
 func (m OverlaySetShowHinge) Call(c Client) error {
+	return call(m.ProtoReq(), m, nil, c)
+}
+
+// OverlaySetShowIsolatedElements Show elements in isolation mode with overlays.
+type OverlaySetShowIsolatedElements struct {
+
+	// IsolatedElementHighlightConfigs An array of node identifiers and descriptors for the highlight appearance.
+	IsolatedElementHighlightConfigs []*OverlayIsolatedElementHighlightConfig `json:"isolatedElementHighlightConfigs"`
+}
+
+// ProtoReq name
+func (m OverlaySetShowIsolatedElements) ProtoReq() string { return "Overlay.setShowIsolatedElements" }
+
+// Call sends the request
+func (m OverlaySetShowIsolatedElements) Call(c Client) error {
 	return call(m.ProtoReq(), m, nil, c)
 }
 

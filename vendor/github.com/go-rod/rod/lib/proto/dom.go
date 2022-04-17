@@ -103,6 +103,21 @@ const (
 
 	// DOMPseudoTypeInputListButton enum const
 	DOMPseudoTypeInputListButton DOMPseudoType = "input-list-button"
+
+	// DOMPseudoTypePageTransition enum const
+	DOMPseudoTypePageTransition DOMPseudoType = "page-transition"
+
+	// DOMPseudoTypePageTransitionContainer enum const
+	DOMPseudoTypePageTransitionContainer DOMPseudoType = "page-transition-container"
+
+	// DOMPseudoTypePageTransitionImageWrapper enum const
+	DOMPseudoTypePageTransitionImageWrapper DOMPseudoType = "page-transition-image-wrapper"
+
+	// DOMPseudoTypePageTransitionOutgoingImage enum const
+	DOMPseudoTypePageTransitionOutgoingImage DOMPseudoType = "page-transition-outgoing-image"
+
+	// DOMPseudoTypePageTransitionIncomingImage enum const
+	DOMPseudoTypePageTransitionIncomingImage DOMPseudoType = "page-transition-incoming-image"
 )
 
 // DOMShadowRootType Shadow root type.
@@ -161,7 +176,7 @@ type DOMNode struct {
 	NodeValue string `json:"nodeValue"`
 
 	// ChildNodeCount (optional) Child count for `Container` nodes.
-	ChildNodeCount int `json:"childNodeCount,omitempty"`
+	ChildNodeCount *int `json:"childNodeCount,omitempty"`
 
 	// Children (optional) Child nodes of this node when requested with children.
 	Children []*DOMNode `json:"children,omitempty"`
@@ -242,7 +257,7 @@ type DOMRGBA struct {
 	B int `json:"b"`
 
 	// A (optional) The alpha component, in the [0-1] range (default: 1).
-	A float64 `json:"a,omitempty"`
+	A *float64 `json:"a,omitempty"`
 }
 
 // DOMQuad An array of quad vertices, x immediately followed by y for each point, points clock-wise.
@@ -382,7 +397,7 @@ type DOMDescribeNode struct {
 
 	// Depth (optional) The maximum depth at which children should be retrieved, defaults to 1. Use -1 for the
 	// entire subtree or provide an integer larger than 0.
-	Depth int `json:"depth,omitempty"`
+	Depth *int `json:"depth,omitempty"`
 
 	// Pierce (optional) Whether or not iframes and shadow roots should be traversed when returning the subtree
 	// (default is false).
@@ -461,8 +476,22 @@ func (m DOMDiscardSearchResults) Call(c Client) error {
 	return call(m.ProtoReq(), m, nil, c)
 }
 
+// DOMEnableIncludeWhitespace enum
+type DOMEnableIncludeWhitespace string
+
+const (
+	// DOMEnableIncludeWhitespaceNone enum const
+	DOMEnableIncludeWhitespaceNone DOMEnableIncludeWhitespace = "none"
+
+	// DOMEnableIncludeWhitespaceAll enum const
+	DOMEnableIncludeWhitespaceAll DOMEnableIncludeWhitespace = "all"
+)
+
 // DOMEnable Enables DOM agent for the given page.
 type DOMEnable struct {
+
+	// IncludeWhitespace (experimental) (optional) Whether to include whitespaces in the children array of returned Nodes.
+	IncludeWhitespace DOMEnableIncludeWhitespace `json:"includeWhitespace,omitempty"`
 }
 
 // ProtoReq name
@@ -582,7 +611,7 @@ type DOMGetDocument struct {
 
 	// Depth (optional) The maximum depth at which children should be retrieved, defaults to 1. Use -1 for the
 	// entire subtree or provide an integer larger than 0.
-	Depth int `json:"depth,omitempty"`
+	Depth *int `json:"depth,omitempty"`
 
 	// Pierce (optional) Whether or not iframes and shadow roots should be traversed when returning the subtree
 	// (default is false).
@@ -612,7 +641,7 @@ type DOMGetFlattenedDocument struct {
 
 	// Depth (optional) The maximum depth at which children should be retrieved, defaults to 1. Use -1 for the
 	// entire subtree or provide an integer larger than 0.
-	Depth int `json:"depth,omitempty"`
+	Depth *int `json:"depth,omitempty"`
 
 	// Pierce (optional) Whether or not iframes and shadow roots should be traversed when returning the subtree
 	// (default is false).
@@ -1055,7 +1084,7 @@ type DOMRequestChildNodes struct {
 
 	// Depth (optional) The maximum depth at which children should be retrieved, defaults to 1. Use -1 for the
 	// entire subtree or provide an integer larger than 0.
-	Depth int `json:"depth,omitempty"`
+	Depth *int `json:"depth,omitempty"`
 
 	// Pierce (optional) Whether or not iframes and shadow roots should be traversed when returning the sub-tree
 	// (default is false).
@@ -1404,6 +1433,33 @@ type DOMGetContainerForNodeResult struct {
 
 	// NodeID (optional) The container node for the given node, or null if not found.
 	NodeID DOMNodeID `json:"nodeId,omitempty"`
+}
+
+// DOMGetQueryingDescendantsForContainer (experimental) Returns the descendants of a container query container that have
+// container queries against this container.
+type DOMGetQueryingDescendantsForContainer struct {
+
+	// NodeID Id of the container node to find querying descendants from.
+	NodeID DOMNodeID `json:"nodeId"`
+}
+
+// ProtoReq name
+func (m DOMGetQueryingDescendantsForContainer) ProtoReq() string {
+	return "DOM.getQueryingDescendantsForContainer"
+}
+
+// Call the request
+func (m DOMGetQueryingDescendantsForContainer) Call(c Client) (*DOMGetQueryingDescendantsForContainerResult, error) {
+	var res DOMGetQueryingDescendantsForContainerResult
+	return &res, call(m.ProtoReq(), m, &res, c)
+}
+
+// DOMGetQueryingDescendantsForContainerResult (experimental) Returns the descendants of a container query container that have
+// container queries against this container.
+type DOMGetQueryingDescendantsForContainerResult struct {
+
+	// NodeIds Descendant nodes with container queries against the given container.
+	NodeIds []DOMNodeID `json:"nodeIds"`
 }
 
 // DOMAttributeModified Fired when `Element`'s attribute is modified.

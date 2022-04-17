@@ -35,6 +35,9 @@ func (j JSON) JSON(prefix, indent string) string {
 
 // Raw underlaying value
 func (j JSON) Raw() interface{} {
+	if j.value == nil {
+		return nil
+	}
 	return *j.value
 }
 
@@ -211,4 +214,24 @@ func Path(path string) []interface{} {
 		sects[i] = s
 	}
 	return sects
+}
+
+// Num returns the pointer of the v
+func Num(v float64) *float64 {
+	return &v
+}
+
+// Int returns the pointer of the v
+func Int(v int) *int {
+	return &v
+}
+
+// Str returns the pointer of the v
+func Str(v string) *string {
+	return &v
+}
+
+// Bool returns the pointer of the v
+func Bool(v bool) *bool {
+	return &v
 }

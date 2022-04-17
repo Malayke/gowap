@@ -71,6 +71,14 @@ const (
 	LogLogEntryLevelError LogLogEntryLevel = "error"
 )
 
+// LogLogEntryCategory enum
+type LogLogEntryCategory string
+
+const (
+	// LogLogEntryCategoryCors enum const
+	LogLogEntryCategoryCors LogLogEntryCategory = "cors"
+)
+
 // LogLogEntry Log entry.
 type LogLogEntry struct {
 
@@ -83,6 +91,9 @@ type LogLogEntry struct {
 	// Text Logged text.
 	Text string `json:"text"`
 
+	// Category (optional) ...
+	Category LogLogEntryCategory `json:"category,omitempty"`
+
 	// Timestamp Timestamp when this entry was added.
 	Timestamp RuntimeTimestamp `json:"timestamp"`
 
@@ -90,7 +101,7 @@ type LogLogEntry struct {
 	URL string `json:"url,omitempty"`
 
 	// LineNumber (optional) Line number in the resource.
-	LineNumber int `json:"lineNumber,omitempty"`
+	LineNumber *int `json:"lineNumber,omitempty"`
 
 	// StackTrace (optional) JavaScript stack trace.
 	StackTrace *RuntimeStackTrace `json:"stackTrace,omitempty"`

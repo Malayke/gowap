@@ -21,6 +21,94 @@ other objects in their object group.
 // RuntimeScriptID Unique script identifier.
 type RuntimeScriptID string
 
+// RuntimeWebDriverValueType enum
+type RuntimeWebDriverValueType string
+
+const (
+	// RuntimeWebDriverValueTypeUndefined enum const
+	RuntimeWebDriverValueTypeUndefined RuntimeWebDriverValueType = "undefined"
+
+	// RuntimeWebDriverValueTypeNull enum const
+	RuntimeWebDriverValueTypeNull RuntimeWebDriverValueType = "null"
+
+	// RuntimeWebDriverValueTypeString enum const
+	RuntimeWebDriverValueTypeString RuntimeWebDriverValueType = "string"
+
+	// RuntimeWebDriverValueTypeNumber enum const
+	RuntimeWebDriverValueTypeNumber RuntimeWebDriverValueType = "number"
+
+	// RuntimeWebDriverValueTypeBoolean enum const
+	RuntimeWebDriverValueTypeBoolean RuntimeWebDriverValueType = "boolean"
+
+	// RuntimeWebDriverValueTypeBigint enum const
+	RuntimeWebDriverValueTypeBigint RuntimeWebDriverValueType = "bigint"
+
+	// RuntimeWebDriverValueTypeRegexp enum const
+	RuntimeWebDriverValueTypeRegexp RuntimeWebDriverValueType = "regexp"
+
+	// RuntimeWebDriverValueTypeDate enum const
+	RuntimeWebDriverValueTypeDate RuntimeWebDriverValueType = "date"
+
+	// RuntimeWebDriverValueTypeSymbol enum const
+	RuntimeWebDriverValueTypeSymbol RuntimeWebDriverValueType = "symbol"
+
+	// RuntimeWebDriverValueTypeArray enum const
+	RuntimeWebDriverValueTypeArray RuntimeWebDriverValueType = "array"
+
+	// RuntimeWebDriverValueTypeObject enum const
+	RuntimeWebDriverValueTypeObject RuntimeWebDriverValueType = "object"
+
+	// RuntimeWebDriverValueTypeFunction enum const
+	RuntimeWebDriverValueTypeFunction RuntimeWebDriverValueType = "function"
+
+	// RuntimeWebDriverValueTypeMap enum const
+	RuntimeWebDriverValueTypeMap RuntimeWebDriverValueType = "map"
+
+	// RuntimeWebDriverValueTypeSet enum const
+	RuntimeWebDriverValueTypeSet RuntimeWebDriverValueType = "set"
+
+	// RuntimeWebDriverValueTypeWeakmap enum const
+	RuntimeWebDriverValueTypeWeakmap RuntimeWebDriverValueType = "weakmap"
+
+	// RuntimeWebDriverValueTypeWeakset enum const
+	RuntimeWebDriverValueTypeWeakset RuntimeWebDriverValueType = "weakset"
+
+	// RuntimeWebDriverValueTypeError enum const
+	RuntimeWebDriverValueTypeError RuntimeWebDriverValueType = "error"
+
+	// RuntimeWebDriverValueTypeProxy enum const
+	RuntimeWebDriverValueTypeProxy RuntimeWebDriverValueType = "proxy"
+
+	// RuntimeWebDriverValueTypePromise enum const
+	RuntimeWebDriverValueTypePromise RuntimeWebDriverValueType = "promise"
+
+	// RuntimeWebDriverValueTypeTypedarray enum const
+	RuntimeWebDriverValueTypeTypedarray RuntimeWebDriverValueType = "typedarray"
+
+	// RuntimeWebDriverValueTypeArraybuffer enum const
+	RuntimeWebDriverValueTypeArraybuffer RuntimeWebDriverValueType = "arraybuffer"
+
+	// RuntimeWebDriverValueTypeNode enum const
+	RuntimeWebDriverValueTypeNode RuntimeWebDriverValueType = "node"
+
+	// RuntimeWebDriverValueTypeWindow enum const
+	RuntimeWebDriverValueTypeWindow RuntimeWebDriverValueType = "window"
+)
+
+// RuntimeWebDriverValue Represents the value serialiazed by the WebDriver BiDi specification
+// https://w3c.github.io/webdriver-bidi.
+type RuntimeWebDriverValue struct {
+
+	// Type ...
+	Type RuntimeWebDriverValueType `json:"type"`
+
+	// Value (optional) ...
+	Value gson.JSON `json:"value,omitempty"`
+
+	// ObjectID (optional) ...
+	ObjectID string `json:"objectId,omitempty"`
+}
+
 // RuntimeRemoteObjectID Unique object identifier.
 type RuntimeRemoteObjectID string
 
@@ -142,6 +230,9 @@ type RuntimeRemoteObject struct {
 
 	// Description (optional) String representation of the object.
 	Description string `json:"description,omitempty"`
+
+	// WebDriverValue (experimental) (optional) WebDriver BiDi representation of the value.
+	WebDriverValue *RuntimeWebDriverValue `json:"webDriverValue,omitempty"`
 
 	// ObjectID (optional) Unique object identifier (for non-primitive values).
 	ObjectID RuntimeRemoteObjectID `json:"objectId,omitempty"`
@@ -674,6 +765,9 @@ type RuntimeCallFunctionOn struct {
 
 	// ThrowOnSideEffect (experimental) (optional) Whether to throw an exception if side effect cannot be ruled out during evaluation.
 	ThrowOnSideEffect bool `json:"throwOnSideEffect,omitempty"`
+
+	// GenerateWebDriverValue (experimental) (optional) Whether the result should be serialized according to https://w3c.github.io/webdriver-bidi.
+	GenerateWebDriverValue bool `json:"generateWebDriverValue,omitempty"`
 }
 
 // ProtoReq name
@@ -834,6 +928,9 @@ type RuntimeEvaluate struct {
 	// boundaries).
 	// This is mutually exclusive with `contextId`.
 	UniqueContextID string `json:"uniqueContextId,omitempty"`
+
+	// GenerateWebDriverValue (experimental) (optional) Whether the result should be serialized according to https://w3c.github.io/webdriver-bidi.
+	GenerateWebDriverValue bool `json:"generateWebDriverValue,omitempty"`
 }
 
 // ProtoReq name
@@ -917,6 +1014,9 @@ type RuntimeGetProperties struct {
 
 	// GeneratePreview (experimental) (optional) Whether preview should be generated for the results.
 	GeneratePreview bool `json:"generatePreview,omitempty"`
+
+	// NonIndexedPropertiesOnly (experimental) (optional) If true, returns non-indexed properties only.
+	NonIndexedPropertiesOnly bool `json:"nonIndexedPropertiesOnly,omitempty"`
 }
 
 // ProtoReq name
@@ -1201,6 +1301,37 @@ func (m RuntimeRemoveBinding) Call(c Client) error {
 	return call(m.ProtoReq(), m, nil, c)
 }
 
+// RuntimeGetExceptionDetails (experimental) This method tries to lookup and populate exception details for a
+// JavaScript Error object.
+// Note that the stackTrace portion of the resulting exceptionDetails will
+// only be populated if the Runtime domain was enabled at the time when the
+// Error was thrown.
+type RuntimeGetExceptionDetails struct {
+
+	// ErrorObjectID The error object for which to resolve the exception details.
+	ErrorObjectID RuntimeRemoteObjectID `json:"errorObjectId"`
+}
+
+// ProtoReq name
+func (m RuntimeGetExceptionDetails) ProtoReq() string { return "Runtime.getExceptionDetails" }
+
+// Call the request
+func (m RuntimeGetExceptionDetails) Call(c Client) (*RuntimeGetExceptionDetailsResult, error) {
+	var res RuntimeGetExceptionDetailsResult
+	return &res, call(m.ProtoReq(), m, &res, c)
+}
+
+// RuntimeGetExceptionDetailsResult (experimental) This method tries to lookup and populate exception details for a
+// JavaScript Error object.
+// Note that the stackTrace portion of the resulting exceptionDetails will
+// only be populated if the Runtime domain was enabled at the time when the
+// Error was thrown.
+type RuntimeGetExceptionDetailsResult struct {
+
+	// ExceptionDetails (optional) ...
+	ExceptionDetails *RuntimeExceptionDetails `json:"exceptionDetails,omitempty"`
+}
+
 // RuntimeBindingCalled (experimental) Notification is issued every time when binding is called.
 type RuntimeBindingCalled struct {
 
@@ -1381,6 +1512,9 @@ type RuntimeInspectRequested struct {
 
 	// Hints ...
 	Hints map[string]gson.JSON `json:"hints"`
+
+	// ExecutionContextID (experimental) (optional) Identifier of the context where the call was made.
+	ExecutionContextID RuntimeExecutionContextID `json:"executionContextId,omitempty"`
 }
 
 // ProtoEvent name

@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"runtime/debug"
 	"sync"
 	"time"
 
@@ -23,7 +24,6 @@ import (
 
 // CDPClient is usually used to make rod side-effect free. Such as proxy all IO of rod.
 type CDPClient interface {
-	Connect(ctx context.Context) error
 	Event() <-chan *cdp.Event
 	Call(ctx context.Context, sessionID, method string, params interface{}) ([]byte, error)
 }
@@ -153,11 +153,11 @@ func (bp BrowserPool) Cleanup(iteratee func(*Browser)) {
 	}
 }
 
-var _ io.Reader = &StreamReader{}
+var _ io.ReadCloser = &StreamReader{}
 
 // StreamReader for browser data stream
 type StreamReader struct {
-	Offset int
+	Offset *int
 
 	c      proto.Client
 	handle proto.IOStreamHandle
@@ -199,15 +199,16 @@ func (sr *StreamReader) Read(p []byte) (n int, err error) {
 	return sr.buf.Read(p)
 }
 
-// Try try fn with recover, return the panic as value
+// Close the stream, discard any temporary backing storage.
+func (sr *StreamReader) Close() error {
+	return proto.IOClose{Handle: sr.handle}.Call(sr.c)
+}
+
+// Try try fn with recover, return the panic as rod.ErrTry
 func Try(fn func()) (err error) {
 	defer func() {
 		if val := recover(); val != nil {
-			var ok bool
-			err, ok = val.(error)
-			if !ok {
-				err = &ErrTry{val}
-			}
+			err = &ErrTry{val, string(debug.Stack())}
 		}
 	}()
 
@@ -279,53 +280,6 @@ func mustToJSONForDev(value interface{}) string {
 	utils.E(enc.Encode(value))
 
 	return buf.String()
-}
-
-// detect if a js string is a function definition
-var regFn = regexp.MustCompile(`\A\s*function\s*\(`)
-
-// detect if a js string is a function definition
-// Samples:
-//
-// function () {}
-// a => {}
-// (a, b, c) =>
-// ({a: b}, ...list) => {}
-func detectJSFunction(js string) bool {
-	if regFn.MatchString(js) {
-		return true
-	}
-
-	// The algorithm is pretty simple, the braces before "=>" must be balanced.
-	// Such as "foo(() => {})", there are 2 "(", but only 1 ")".
-	// Here we use a simple state machine.
-
-	balanced := true
-	last := ' '
-	for _, r := range js {
-		if r == '(' {
-			if balanced {
-				balanced = false
-			} else {
-				return false
-			}
-		}
-		if r == ')' {
-			if balanced {
-				return false
-			}
-			balanced = true
-		}
-
-		if last == '=' {
-			if r == '>' {
-				return balanced
-			}
-			return false
-		}
-		last = r
-	}
-	return false
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs

@@ -1,36 +1,33 @@
 package goob
 
 import (
+	"context"
 	"sync"
 )
 
 // Event interface
 type Event interface{}
 
-// Pipe the Event via Write to Events. Events uses an internal buffer so it won't block Write.
-// Call Stop to abort.
-type Pipe struct {
-	Write  func(Event)
-	Events <-chan Event
-	Stop   func()
-}
+// Events channel
+type Events <-chan Event
 
-// NewPipe instance
-func NewPipe() *Pipe {
+// NewPipe instance.
+// Pipe the Event via Write to Events. Events uses an internal buffer so it won't block Write.
+func NewPipe(ctx context.Context) (Write func(Event), Events <-chan Event) {
 	events := make(chan Event)
 	lock := sync.Mutex{}
-	buf := []Event{}
+	buf := []Event{} // using slice is faster than linked-list in general cases
 	wait := make(chan struct{}, 1)
-	stop := make(chan struct{})
 
 	write := func(e Event) {
 		lock.Lock()
+		defer lock.Unlock()
+
 		buf = append(buf, e)
-		lock.Unlock()
 
 		if len(wait) == 0 {
 			select {
-			case <-stop:
+			case <-ctx.Done():
 				return
 			case wait <- struct{}{}:
 			}
@@ -48,19 +45,19 @@ func NewPipe() *Pipe {
 
 			for _, e := range section {
 				select {
-				case <-stop:
+				case <-ctx.Done():
 					return
 				case events <- e:
 				}
 			}
 
 			select {
-			case <-stop:
+			case <-ctx.Done():
 				return
 			case <-wait:
 			}
 		}
 	}()
 
-	return &Pipe{write, events, func() { close(stop) }}
+	return write, events
 }

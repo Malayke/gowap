@@ -57,6 +57,13 @@ type CSSInheritedStyleEntry struct {
 	MatchedCSSRules []*CSSRuleMatch `json:"matchedCSSRules"`
 }
 
+// CSSInheritedPseudoElementMatches Inherited pseudo element matches from pseudos of an ancestor node.
+type CSSInheritedPseudoElementMatches struct {
+
+	// PseudoElements Matches of pseudo styles from the pseudos of an ancestor node.
+	PseudoElements []*CSSPseudoElementMatches `json:"pseudoElements"`
+}
+
 // CSSRuleMatch Match data for a CSS rule.
 type CSSRuleMatch struct {
 
@@ -172,6 +179,14 @@ type CSSCSSRule struct {
 	// ContainerQueries (experimental) (optional) Container query list array (for rules involving container queries).
 	// The array enumerates container queries starting with the innermost one, going outwards.
 	ContainerQueries []*CSSCSSContainerQuery `json:"containerQueries,omitempty"`
+
+	// Supports (experimental) (optional) @supports CSS at-rule array.
+	// The array enumerates @supports at-rules starting with the innermost one, going outwards.
+	Supports []*CSSCSSSupports `json:"supports,omitempty"`
+
+	// Layers (experimental) (optional) Cascade layer array. Contains the layer hierarchy that this rule belongs to starting
+	// with the innermost layer and going outwards.
+	Layers []*CSSCSSLayer `json:"layers,omitempty"`
 }
 
 // CSSRuleUsage CSS coverage information.
@@ -347,7 +362,7 @@ type CSSMediaQueryExpression struct {
 	ValueRange *CSSSourceRange `json:"valueRange,omitempty"`
 
 	// ComputedLength (optional) Computed length of media query expression (if applicable).
-	ComputedLength float64 `json:"computedLength,omitempty"`
+	ComputedLength *float64 `json:"computedLength,omitempty"`
 }
 
 // CSSCSSContainerQuery (experimental) CSS container query rule descriptor.
@@ -365,6 +380,51 @@ type CSSCSSContainerQuery struct {
 
 	// Name (optional) Optional name for the container.
 	Name string `json:"name,omitempty"`
+}
+
+// CSSCSSSupports (experimental) CSS Supports at-rule descriptor.
+type CSSCSSSupports struct {
+
+	// Text Supports rule text.
+	Text string `json:"text"`
+
+	// Active Whether the supports condition is satisfied.
+	Active bool `json:"active"`
+
+	// Range (optional) The associated rule header range in the enclosing stylesheet (if
+	// available).
+	Range *CSSSourceRange `json:"range,omitempty"`
+
+	// StyleSheetID (optional) Identifier of the stylesheet containing this object (if exists).
+	StyleSheetID CSSStyleSheetID `json:"styleSheetId,omitempty"`
+}
+
+// CSSCSSLayer (experimental) CSS Layer at-rule descriptor.
+type CSSCSSLayer struct {
+
+	// Text Layer name.
+	Text string `json:"text"`
+
+	// Range (optional) The associated rule header range in the enclosing stylesheet (if
+	// available).
+	Range *CSSSourceRange `json:"range,omitempty"`
+
+	// StyleSheetID (optional) Identifier of the stylesheet containing this object (if exists).
+	StyleSheetID CSSStyleSheetID `json:"styleSheetId,omitempty"`
+}
+
+// CSSCSSLayerData (experimental) CSS Layer data.
+type CSSCSSLayerData struct {
+
+	// Name Layer name.
+	Name string `json:"name"`
+
+	// SubLayers (optional) Direct sub-layers
+	SubLayers []*CSSCSSLayerData `json:"subLayers,omitempty"`
+
+	// Order Layer order. The order determines the order of the layer in the cascade order.
+	// A higher number has higher priority in the cascade order.
+	Order float64 `json:"order"`
 }
 
 // CSSPlatformFontUsage Information about amount of glyphs that were rendered with given font.
@@ -711,6 +771,9 @@ type CSSGetMatchedStylesForNodeResult struct {
 	// Inherited (optional) A chain of inherited styles (from the immediate node parent up to the DOM tree root).
 	Inherited []*CSSInheritedStyleEntry `json:"inherited,omitempty"`
 
+	// InheritedPseudoElements (optional) A chain of inherited pseudo element styles (from the immediate node parent up to the DOM tree root).
+	InheritedPseudoElements []*CSSInheritedPseudoElementMatches `json:"inheritedPseudoElements,omitempty"`
+
 	// CSSKeyframesRules (optional) A list of CSS keyframed animations matching this node.
 	CSSKeyframesRules []*CSSCSSKeyframesRule `json:"cssKeyframesRules,omitempty"`
 }
@@ -781,6 +844,35 @@ type CSSGetStyleSheetTextResult struct {
 
 	// Text The stylesheet text.
 	Text string `json:"text"`
+}
+
+// CSSGetLayersForNode (experimental) Returns all layers parsed by the rendering engine for the tree scope of a node.
+// Given a DOM element identified by nodeId, getLayersForNode returns the root
+// layer for the nearest ancestor document or shadow root. The layer root contains
+// the full layer tree for the tree scope and their ordering.
+type CSSGetLayersForNode struct {
+
+	// NodeID ...
+	NodeID DOMNodeID `json:"nodeId"`
+}
+
+// ProtoReq name
+func (m CSSGetLayersForNode) ProtoReq() string { return "CSS.getLayersForNode" }
+
+// Call the request
+func (m CSSGetLayersForNode) Call(c Client) (*CSSGetLayersForNodeResult, error) {
+	var res CSSGetLayersForNodeResult
+	return &res, call(m.ProtoReq(), m, &res, c)
+}
+
+// CSSGetLayersForNodeResult (experimental) Returns all layers parsed by the rendering engine for the tree scope of a node.
+// Given a DOM element identified by nodeId, getLayersForNode returns the root
+// layer for the nearest ancestor document or shadow root. The layer root contains
+// the full layer tree for the tree scope and their ordering.
+type CSSGetLayersForNodeResult struct {
+
+	// RootLayer ...
+	RootLayer *CSSCSSLayerData `json:"rootLayer"`
 }
 
 // CSSTrackComputedStyleUpdates (experimental) Starts tracking the given computed styles for updates. The specified array of properties
@@ -932,6 +1024,35 @@ type CSSSetContainerQueryTextResult struct {
 
 	// ContainerQuery The resulting CSS container query rule after modification.
 	ContainerQuery *CSSCSSContainerQuery `json:"containerQuery"`
+}
+
+// CSSSetSupportsText (experimental) Modifies the expression of a supports at-rule.
+type CSSSetSupportsText struct {
+
+	// StyleSheetID ...
+	StyleSheetID CSSStyleSheetID `json:"styleSheetId"`
+
+	// Range ...
+	Range *CSSSourceRange `json:"range"`
+
+	// Text ...
+	Text string `json:"text"`
+}
+
+// ProtoReq name
+func (m CSSSetSupportsText) ProtoReq() string { return "CSS.setSupportsText" }
+
+// Call the request
+func (m CSSSetSupportsText) Call(c Client) (*CSSSetSupportsTextResult, error) {
+	var res CSSSetSupportsTextResult
+	return &res, call(m.ProtoReq(), m, &res, c)
+}
+
+// CSSSetSupportsTextResult (experimental) Modifies the expression of a supports at-rule.
+type CSSSetSupportsTextResult struct {
+
+	// Supports The resulting CSS Supports rule after modification.
+	Supports *CSSCSSSupports `json:"supports"`
 }
 
 // CSSSetRuleSelector Modifies the rule selector.

@@ -253,10 +253,10 @@ func (p *Page) MustGetWindow() *proto.BrowserBounds {
 // MustSetWindow is similar to Page.SetWindow
 func (p *Page) MustSetWindow(left, top, width, height int) *Page {
 	p.e(p.SetWindow(&proto.BrowserBounds{
-		Left:        left,
-		Top:         top,
-		Width:       width,
-		Height:      height,
+		Left:        gson.Int(left),
+		Top:         gson.Int(top),
+		Width:       gson.Int(width),
+		Height:      gson.Int(height),
 		WindowState: proto.BrowserWindowStateNormal,
 	}))
 	return p
@@ -816,6 +816,12 @@ func (el *Element) MustContainsElement(target *Element) bool {
 func (el *Element) MustSetFiles(paths ...string) *Element {
 	el.e(el.SetFiles(paths))
 	return el
+}
+
+// MustSetDocumentContent is similar to Page.SetDocumentContent
+func (p *Page) MustSetDocumentContent(html string) *Page {
+	p.e(p.SetDocumentContent(html))
+	return p
 }
 
 // MustText is similar to Element.Text

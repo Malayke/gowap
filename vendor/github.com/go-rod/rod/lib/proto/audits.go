@@ -40,70 +40,76 @@ type AuditsAffectedFrame struct {
 	FrameID PageFrameID `json:"frameId"`
 }
 
-// AuditsSameSiteCookieExclusionReason ...
-type AuditsSameSiteCookieExclusionReason string
+// AuditsCookieExclusionReason ...
+type AuditsCookieExclusionReason string
 
 const (
-	// AuditsSameSiteCookieExclusionReasonExcludeSameSiteUnspecifiedTreatedAsLax enum const
-	AuditsSameSiteCookieExclusionReasonExcludeSameSiteUnspecifiedTreatedAsLax AuditsSameSiteCookieExclusionReason = "ExcludeSameSiteUnspecifiedTreatedAsLax"
+	// AuditsCookieExclusionReasonExcludeSameSiteUnspecifiedTreatedAsLax enum const
+	AuditsCookieExclusionReasonExcludeSameSiteUnspecifiedTreatedAsLax AuditsCookieExclusionReason = "ExcludeSameSiteUnspecifiedTreatedAsLax"
 
-	// AuditsSameSiteCookieExclusionReasonExcludeSameSiteNoneInsecure enum const
-	AuditsSameSiteCookieExclusionReasonExcludeSameSiteNoneInsecure AuditsSameSiteCookieExclusionReason = "ExcludeSameSiteNoneInsecure"
+	// AuditsCookieExclusionReasonExcludeSameSiteNoneInsecure enum const
+	AuditsCookieExclusionReasonExcludeSameSiteNoneInsecure AuditsCookieExclusionReason = "ExcludeSameSiteNoneInsecure"
 
-	// AuditsSameSiteCookieExclusionReasonExcludeSameSiteLax enum const
-	AuditsSameSiteCookieExclusionReasonExcludeSameSiteLax AuditsSameSiteCookieExclusionReason = "ExcludeSameSiteLax"
+	// AuditsCookieExclusionReasonExcludeSameSiteLax enum const
+	AuditsCookieExclusionReasonExcludeSameSiteLax AuditsCookieExclusionReason = "ExcludeSameSiteLax"
 
-	// AuditsSameSiteCookieExclusionReasonExcludeSameSiteStrict enum const
-	AuditsSameSiteCookieExclusionReasonExcludeSameSiteStrict AuditsSameSiteCookieExclusionReason = "ExcludeSameSiteStrict"
+	// AuditsCookieExclusionReasonExcludeSameSiteStrict enum const
+	AuditsCookieExclusionReasonExcludeSameSiteStrict AuditsCookieExclusionReason = "ExcludeSameSiteStrict"
 
-	// AuditsSameSiteCookieExclusionReasonExcludeInvalidSameParty enum const
-	AuditsSameSiteCookieExclusionReasonExcludeInvalidSameParty AuditsSameSiteCookieExclusionReason = "ExcludeInvalidSameParty"
+	// AuditsCookieExclusionReasonExcludeInvalidSameParty enum const
+	AuditsCookieExclusionReasonExcludeInvalidSameParty AuditsCookieExclusionReason = "ExcludeInvalidSameParty"
+
+	// AuditsCookieExclusionReasonExcludeSamePartyCrossPartyContext enum const
+	AuditsCookieExclusionReasonExcludeSamePartyCrossPartyContext AuditsCookieExclusionReason = "ExcludeSamePartyCrossPartyContext"
 )
 
-// AuditsSameSiteCookieWarningReason ...
-type AuditsSameSiteCookieWarningReason string
+// AuditsCookieWarningReason ...
+type AuditsCookieWarningReason string
 
 const (
-	// AuditsSameSiteCookieWarningReasonWarnSameSiteUnspecifiedCrossSiteContext enum const
-	AuditsSameSiteCookieWarningReasonWarnSameSiteUnspecifiedCrossSiteContext AuditsSameSiteCookieWarningReason = "WarnSameSiteUnspecifiedCrossSiteContext"
+	// AuditsCookieWarningReasonWarnSameSiteUnspecifiedCrossSiteContext enum const
+	AuditsCookieWarningReasonWarnSameSiteUnspecifiedCrossSiteContext AuditsCookieWarningReason = "WarnSameSiteUnspecifiedCrossSiteContext"
 
-	// AuditsSameSiteCookieWarningReasonWarnSameSiteNoneInsecure enum const
-	AuditsSameSiteCookieWarningReasonWarnSameSiteNoneInsecure AuditsSameSiteCookieWarningReason = "WarnSameSiteNoneInsecure"
+	// AuditsCookieWarningReasonWarnSameSiteNoneInsecure enum const
+	AuditsCookieWarningReasonWarnSameSiteNoneInsecure AuditsCookieWarningReason = "WarnSameSiteNoneInsecure"
 
-	// AuditsSameSiteCookieWarningReasonWarnSameSiteUnspecifiedLaxAllowUnsafe enum const
-	AuditsSameSiteCookieWarningReasonWarnSameSiteUnspecifiedLaxAllowUnsafe AuditsSameSiteCookieWarningReason = "WarnSameSiteUnspecifiedLaxAllowUnsafe"
+	// AuditsCookieWarningReasonWarnSameSiteUnspecifiedLaxAllowUnsafe enum const
+	AuditsCookieWarningReasonWarnSameSiteUnspecifiedLaxAllowUnsafe AuditsCookieWarningReason = "WarnSameSiteUnspecifiedLaxAllowUnsafe"
 
-	// AuditsSameSiteCookieWarningReasonWarnSameSiteStrictLaxDowngradeStrict enum const
-	AuditsSameSiteCookieWarningReasonWarnSameSiteStrictLaxDowngradeStrict AuditsSameSiteCookieWarningReason = "WarnSameSiteStrictLaxDowngradeStrict"
+	// AuditsCookieWarningReasonWarnSameSiteStrictLaxDowngradeStrict enum const
+	AuditsCookieWarningReasonWarnSameSiteStrictLaxDowngradeStrict AuditsCookieWarningReason = "WarnSameSiteStrictLaxDowngradeStrict"
 
-	// AuditsSameSiteCookieWarningReasonWarnSameSiteStrictCrossDowngradeStrict enum const
-	AuditsSameSiteCookieWarningReasonWarnSameSiteStrictCrossDowngradeStrict AuditsSameSiteCookieWarningReason = "WarnSameSiteStrictCrossDowngradeStrict"
+	// AuditsCookieWarningReasonWarnSameSiteStrictCrossDowngradeStrict enum const
+	AuditsCookieWarningReasonWarnSameSiteStrictCrossDowngradeStrict AuditsCookieWarningReason = "WarnSameSiteStrictCrossDowngradeStrict"
 
-	// AuditsSameSiteCookieWarningReasonWarnSameSiteStrictCrossDowngradeLax enum const
-	AuditsSameSiteCookieWarningReasonWarnSameSiteStrictCrossDowngradeLax AuditsSameSiteCookieWarningReason = "WarnSameSiteStrictCrossDowngradeLax"
+	// AuditsCookieWarningReasonWarnSameSiteStrictCrossDowngradeLax enum const
+	AuditsCookieWarningReasonWarnSameSiteStrictCrossDowngradeLax AuditsCookieWarningReason = "WarnSameSiteStrictCrossDowngradeLax"
 
-	// AuditsSameSiteCookieWarningReasonWarnSameSiteLaxCrossDowngradeStrict enum const
-	AuditsSameSiteCookieWarningReasonWarnSameSiteLaxCrossDowngradeStrict AuditsSameSiteCookieWarningReason = "WarnSameSiteLaxCrossDowngradeStrict"
+	// AuditsCookieWarningReasonWarnSameSiteLaxCrossDowngradeStrict enum const
+	AuditsCookieWarningReasonWarnSameSiteLaxCrossDowngradeStrict AuditsCookieWarningReason = "WarnSameSiteLaxCrossDowngradeStrict"
 
-	// AuditsSameSiteCookieWarningReasonWarnSameSiteLaxCrossDowngradeLax enum const
-	AuditsSameSiteCookieWarningReasonWarnSameSiteLaxCrossDowngradeLax AuditsSameSiteCookieWarningReason = "WarnSameSiteLaxCrossDowngradeLax"
+	// AuditsCookieWarningReasonWarnSameSiteLaxCrossDowngradeLax enum const
+	AuditsCookieWarningReasonWarnSameSiteLaxCrossDowngradeLax AuditsCookieWarningReason = "WarnSameSiteLaxCrossDowngradeLax"
+
+	// AuditsCookieWarningReasonWarnAttributeValueExceedsMaxSize enum const
+	AuditsCookieWarningReasonWarnAttributeValueExceedsMaxSize AuditsCookieWarningReason = "WarnAttributeValueExceedsMaxSize"
 )
 
-// AuditsSameSiteCookieOperation ...
-type AuditsSameSiteCookieOperation string
+// AuditsCookieOperation ...
+type AuditsCookieOperation string
 
 const (
-	// AuditsSameSiteCookieOperationSetCookie enum const
-	AuditsSameSiteCookieOperationSetCookie AuditsSameSiteCookieOperation = "SetCookie"
+	// AuditsCookieOperationSetCookie enum const
+	AuditsCookieOperationSetCookie AuditsCookieOperation = "SetCookie"
 
-	// AuditsSameSiteCookieOperationReadCookie enum const
-	AuditsSameSiteCookieOperationReadCookie AuditsSameSiteCookieOperation = "ReadCookie"
+	// AuditsCookieOperationReadCookie enum const
+	AuditsCookieOperationReadCookie AuditsCookieOperation = "ReadCookie"
 )
 
-// AuditsSameSiteCookieIssueDetails This information is currently necessary, as the front-end has a difficult
+// AuditsCookieIssueDetails This information is currently necessary, as the front-end has a difficult
 // time finding a specific cookie. With this, we can convey specific error
 // information without the cookie.
-type AuditsSameSiteCookieIssueDetails struct {
+type AuditsCookieIssueDetails struct {
 
 	// Cookie (optional) If AffectedCookie is not set then rawCookieLine contains the raw
 	// Set-Cookie header string. This hints at a problem where the
@@ -115,14 +121,14 @@ type AuditsSameSiteCookieIssueDetails struct {
 	RawCookieLine string `json:"rawCookieLine,omitempty"`
 
 	// CookieWarningReasons ...
-	CookieWarningReasons []AuditsSameSiteCookieWarningReason `json:"cookieWarningReasons"`
+	CookieWarningReasons []AuditsCookieWarningReason `json:"cookieWarningReasons"`
 
 	// CookieExclusionReasons ...
-	CookieExclusionReasons []AuditsSameSiteCookieExclusionReason `json:"cookieExclusionReasons"`
+	CookieExclusionReasons []AuditsCookieExclusionReason `json:"cookieExclusionReasons"`
 
 	// Operation Optionally identifies the site-for-cookies and the cookie url, which
 	// may be used by the front-end as additional context.
-	Operation AuditsSameSiteCookieOperation `json:"operation"`
+	Operation AuditsCookieOperation `json:"operation"`
 
 	// SiteForCookies (optional) ...
 	SiteForCookies string `json:"siteForCookies,omitempty"`
@@ -152,6 +158,9 @@ const (
 type AuditsMixedContentResourceType string
 
 const (
+	// AuditsMixedContentResourceTypeAttributionSrc enum const
+	AuditsMixedContentResourceTypeAttributionSrc AuditsMixedContentResourceType = "AttributionSrc"
+
 	// AuditsMixedContentResourceTypeAudio enum const
 	AuditsMixedContentResourceTypeAudio AuditsMixedContentResourceType = "Audio"
 
@@ -352,6 +361,9 @@ const (
 
 	// AuditsContentSecurityPolicyViolationTypeKTrustedTypesPolicyViolation enum const
 	AuditsContentSecurityPolicyViolationTypeKTrustedTypesPolicyViolation AuditsContentSecurityPolicyViolationType = "kTrustedTypesPolicyViolation"
+
+	// AuditsContentSecurityPolicyViolationTypeKWasmEvalViolation enum const
+	AuditsContentSecurityPolicyViolationTypeKWasmEvalViolation AuditsContentSecurityPolicyViolationType = "kWasmEvalViolation"
 )
 
 // AuditsSourceCodeLocation ...
@@ -444,7 +456,7 @@ type AuditsTrustedWebActivityIssueDetails struct {
 	ViolationType AuditsTwaQualityEnforcementViolationType `json:"violationType"`
 
 	// HTTPStatusCode (optional) ...
-	HTTPStatusCode int `json:"httpStatusCode,omitempty"`
+	HTTPStatusCode *int `json:"httpStatusCode,omitempty"`
 
 	// PackageName (optional) The package name of the Trusted Web Activity client app. This field is
 	// only used when violation type is kDigitalAssetLinks.
@@ -516,14 +528,17 @@ const (
 	// AuditsAttributionReportingIssueTypeInvalidAttributionSourceEventID enum const
 	AuditsAttributionReportingIssueTypeInvalidAttributionSourceEventID AuditsAttributionReportingIssueType = "InvalidAttributionSourceEventId"
 
-	// AuditsAttributionReportingIssueTypeInvalidAttributionData enum const
-	AuditsAttributionReportingIssueTypeInvalidAttributionData AuditsAttributionReportingIssueType = "InvalidAttributionData"
-
 	// AuditsAttributionReportingIssueTypeAttributionSourceUntrustworthyOrigin enum const
 	AuditsAttributionReportingIssueTypeAttributionSourceUntrustworthyOrigin AuditsAttributionReportingIssueType = "AttributionSourceUntrustworthyOrigin"
 
 	// AuditsAttributionReportingIssueTypeAttributionUntrustworthyOrigin enum const
 	AuditsAttributionReportingIssueTypeAttributionUntrustworthyOrigin AuditsAttributionReportingIssueType = "AttributionUntrustworthyOrigin"
+
+	// AuditsAttributionReportingIssueTypeInvalidAttributionSourceExpiry enum const
+	AuditsAttributionReportingIssueTypeInvalidAttributionSourceExpiry AuditsAttributionReportingIssueType = "InvalidAttributionSourceExpiry"
+
+	// AuditsAttributionReportingIssueTypeInvalidAttributionSourcePriority enum const
+	AuditsAttributionReportingIssueTypeInvalidAttributionSourcePriority AuditsAttributionReportingIssueType = "InvalidAttributionSourcePriority"
 )
 
 // AuditsAttributionReportingIssueDetails Details for issues around "Attribution Reporting API" usage.
@@ -577,20 +592,175 @@ type AuditsNavigatorUserAgentIssueDetails struct {
 	Location *AuditsSourceCodeLocation `json:"location,omitempty"`
 }
 
-// AuditsWasmCrossOriginModuleSharingIssueDetails ...
-type AuditsWasmCrossOriginModuleSharingIssueDetails struct {
+// AuditsGenericIssueErrorType ...
+type AuditsGenericIssueErrorType string
 
-	// WasmModuleURL ...
-	WasmModuleURL string `json:"wasmModuleUrl"`
+const (
+	// AuditsGenericIssueErrorTypeCrossOriginPortalPostMessageError enum const
+	AuditsGenericIssueErrorTypeCrossOriginPortalPostMessageError AuditsGenericIssueErrorType = "CrossOriginPortalPostMessageError"
+)
 
-	// SourceOrigin ...
-	SourceOrigin string `json:"sourceOrigin"`
+// AuditsGenericIssueDetails Depending on the concrete errorType, different properties are set.
+type AuditsGenericIssueDetails struct {
 
-	// TargetOrigin ...
-	TargetOrigin string `json:"targetOrigin"`
+	// ErrorType Issues with the same errorType are aggregated in the frontend.
+	ErrorType AuditsGenericIssueErrorType `json:"errorType"`
 
-	// IsWarning ...
-	IsWarning bool `json:"isWarning"`
+	// FrameID (optional) ...
+	FrameID PageFrameID `json:"frameId,omitempty"`
+}
+
+// AuditsDeprecationIssueType ...
+type AuditsDeprecationIssueType string
+
+const (
+	// AuditsDeprecationIssueTypeDeprecationExample enum const
+	AuditsDeprecationIssueTypeDeprecationExample AuditsDeprecationIssueType = "DeprecationExample"
+
+	// AuditsDeprecationIssueTypeUntranslated enum const
+	AuditsDeprecationIssueTypeUntranslated AuditsDeprecationIssueType = "Untranslated"
+)
+
+// AuditsDeprecationIssueDetails This issue tracks information needed to print a deprecation message.
+// The formatting is inherited from the old console.log version, see more at:
+// https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/deprecation.cc
+// TODO(crbug.com/1264960): Re-work format to add i18n support per:
+// https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/public/devtools_protocol/README.md
+type AuditsDeprecationIssueDetails struct {
+
+	// AffectedFrame (optional) ...
+	AffectedFrame *AuditsAffectedFrame `json:"affectedFrame,omitempty"`
+
+	// SourceCodeLocation ...
+	SourceCodeLocation *AuditsSourceCodeLocation `json:"sourceCodeLocation"`
+
+	// Message (deprecated) (optional) The content of an untranslated deprecation issue,
+	// e.g. "window.inefficientLegacyStorageMethod will be removed in M97,
+	// around January 2022. Please use Web Storage or Indexed Database
+	// instead. This standard was abandoned in January, 1970. See
+	// https://www.chromestatus.com/feature/5684870116278272 for more details."
+	Message string `json:"message,omitempty"`
+
+	// DeprecationType (deprecated) (optional) The id of an untranslated deprecation issue e.g. PrefixedStorageInfo.
+	DeprecationType string `json:"deprecationType,omitempty"`
+
+	// Type ...
+	Type AuditsDeprecationIssueType `json:"type"`
+}
+
+// AuditsClientHintIssueReason ...
+type AuditsClientHintIssueReason string
+
+const (
+	// AuditsClientHintIssueReasonMetaTagAllowListInvalidOrigin enum const
+	AuditsClientHintIssueReasonMetaTagAllowListInvalidOrigin AuditsClientHintIssueReason = "MetaTagAllowListInvalidOrigin"
+
+	// AuditsClientHintIssueReasonMetaTagModifiedHTML enum const
+	AuditsClientHintIssueReasonMetaTagModifiedHTML AuditsClientHintIssueReason = "MetaTagModifiedHTML"
+)
+
+// AuditsFederatedAuthRequestIssueDetails ...
+type AuditsFederatedAuthRequestIssueDetails struct {
+
+	// FederatedAuthRequestIssueReason ...
+	FederatedAuthRequestIssueReason AuditsFederatedAuthRequestIssueReason `json:"federatedAuthRequestIssueReason"`
+}
+
+// AuditsFederatedAuthRequestIssueReason Represents the failure reason when a federated authentication reason fails.
+// Should be updated alongside RequestIdTokenStatus in
+// third_party/blink/public/mojom/devtools/inspector_issue.mojom to include
+// all cases except for success.
+type AuditsFederatedAuthRequestIssueReason string
+
+const (
+	// AuditsFederatedAuthRequestIssueReasonApprovalDeclined enum const
+	AuditsFederatedAuthRequestIssueReasonApprovalDeclined AuditsFederatedAuthRequestIssueReason = "ApprovalDeclined"
+
+	// AuditsFederatedAuthRequestIssueReasonTooManyRequests enum const
+	AuditsFederatedAuthRequestIssueReasonTooManyRequests AuditsFederatedAuthRequestIssueReason = "TooManyRequests"
+
+	// AuditsFederatedAuthRequestIssueReasonManifestListHTTPNotFound enum const
+	AuditsFederatedAuthRequestIssueReasonManifestListHTTPNotFound AuditsFederatedAuthRequestIssueReason = "ManifestListHttpNotFound"
+
+	// AuditsFederatedAuthRequestIssueReasonManifestListNoResponse enum const
+	AuditsFederatedAuthRequestIssueReasonManifestListNoResponse AuditsFederatedAuthRequestIssueReason = "ManifestListNoResponse"
+
+	// AuditsFederatedAuthRequestIssueReasonManifestListInvalidResponse enum const
+	AuditsFederatedAuthRequestIssueReasonManifestListInvalidResponse AuditsFederatedAuthRequestIssueReason = "ManifestListInvalidResponse"
+
+	// AuditsFederatedAuthRequestIssueReasonManifestNotInManifestList enum const
+	AuditsFederatedAuthRequestIssueReasonManifestNotInManifestList AuditsFederatedAuthRequestIssueReason = "ManifestNotInManifestList"
+
+	// AuditsFederatedAuthRequestIssueReasonManifestListTooBig enum const
+	AuditsFederatedAuthRequestIssueReasonManifestListTooBig AuditsFederatedAuthRequestIssueReason = "ManifestListTooBig"
+
+	// AuditsFederatedAuthRequestIssueReasonManifestHTTPNotFound enum const
+	AuditsFederatedAuthRequestIssueReasonManifestHTTPNotFound AuditsFederatedAuthRequestIssueReason = "ManifestHttpNotFound"
+
+	// AuditsFederatedAuthRequestIssueReasonManifestNoResponse enum const
+	AuditsFederatedAuthRequestIssueReasonManifestNoResponse AuditsFederatedAuthRequestIssueReason = "ManifestNoResponse"
+
+	// AuditsFederatedAuthRequestIssueReasonManifestInvalidResponse enum const
+	AuditsFederatedAuthRequestIssueReasonManifestInvalidResponse AuditsFederatedAuthRequestIssueReason = "ManifestInvalidResponse"
+
+	// AuditsFederatedAuthRequestIssueReasonClientMetadataHTTPNotFound enum const
+	AuditsFederatedAuthRequestIssueReasonClientMetadataHTTPNotFound AuditsFederatedAuthRequestIssueReason = "ClientMetadataHttpNotFound"
+
+	// AuditsFederatedAuthRequestIssueReasonClientMetadataNoResponse enum const
+	AuditsFederatedAuthRequestIssueReasonClientMetadataNoResponse AuditsFederatedAuthRequestIssueReason = "ClientMetadataNoResponse"
+
+	// AuditsFederatedAuthRequestIssueReasonClientMetadataInvalidResponse enum const
+	AuditsFederatedAuthRequestIssueReasonClientMetadataInvalidResponse AuditsFederatedAuthRequestIssueReason = "ClientMetadataInvalidResponse"
+
+	// AuditsFederatedAuthRequestIssueReasonClientMetadataMissingPrivacyPolicyURL enum const
+	AuditsFederatedAuthRequestIssueReasonClientMetadataMissingPrivacyPolicyURL AuditsFederatedAuthRequestIssueReason = "ClientMetadataMissingPrivacyPolicyUrl"
+
+	// AuditsFederatedAuthRequestIssueReasonDisabledInSettings enum const
+	AuditsFederatedAuthRequestIssueReasonDisabledInSettings AuditsFederatedAuthRequestIssueReason = "DisabledInSettings"
+
+	// AuditsFederatedAuthRequestIssueReasonErrorFetchingSignin enum const
+	AuditsFederatedAuthRequestIssueReasonErrorFetchingSignin AuditsFederatedAuthRequestIssueReason = "ErrorFetchingSignin"
+
+	// AuditsFederatedAuthRequestIssueReasonInvalidSigninResponse enum const
+	AuditsFederatedAuthRequestIssueReasonInvalidSigninResponse AuditsFederatedAuthRequestIssueReason = "InvalidSigninResponse"
+
+	// AuditsFederatedAuthRequestIssueReasonAccountsHTTPNotFound enum const
+	AuditsFederatedAuthRequestIssueReasonAccountsHTTPNotFound AuditsFederatedAuthRequestIssueReason = "AccountsHttpNotFound"
+
+	// AuditsFederatedAuthRequestIssueReasonAccountsNoResponse enum const
+	AuditsFederatedAuthRequestIssueReasonAccountsNoResponse AuditsFederatedAuthRequestIssueReason = "AccountsNoResponse"
+
+	// AuditsFederatedAuthRequestIssueReasonAccountsInvalidResponse enum const
+	AuditsFederatedAuthRequestIssueReasonAccountsInvalidResponse AuditsFederatedAuthRequestIssueReason = "AccountsInvalidResponse"
+
+	// AuditsFederatedAuthRequestIssueReasonIDTokenHTTPNotFound enum const
+	AuditsFederatedAuthRequestIssueReasonIDTokenHTTPNotFound AuditsFederatedAuthRequestIssueReason = "IdTokenHttpNotFound"
+
+	// AuditsFederatedAuthRequestIssueReasonIDTokenNoResponse enum const
+	AuditsFederatedAuthRequestIssueReasonIDTokenNoResponse AuditsFederatedAuthRequestIssueReason = "IdTokenNoResponse"
+
+	// AuditsFederatedAuthRequestIssueReasonIDTokenInvalidResponse enum const
+	AuditsFederatedAuthRequestIssueReasonIDTokenInvalidResponse AuditsFederatedAuthRequestIssueReason = "IdTokenInvalidResponse"
+
+	// AuditsFederatedAuthRequestIssueReasonIDTokenInvalidRequest enum const
+	AuditsFederatedAuthRequestIssueReasonIDTokenInvalidRequest AuditsFederatedAuthRequestIssueReason = "IdTokenInvalidRequest"
+
+	// AuditsFederatedAuthRequestIssueReasonErrorIDToken enum const
+	AuditsFederatedAuthRequestIssueReasonErrorIDToken AuditsFederatedAuthRequestIssueReason = "ErrorIdToken"
+
+	// AuditsFederatedAuthRequestIssueReasonCanceled enum const
+	AuditsFederatedAuthRequestIssueReasonCanceled AuditsFederatedAuthRequestIssueReason = "Canceled"
+)
+
+// AuditsClientHintIssueDetails This issue tracks client hints related issues. It's used to deprecate old
+// features, encourage the use of new ones, and provide general guidance.
+type AuditsClientHintIssueDetails struct {
+
+	// SourceCodeLocation ...
+	SourceCodeLocation *AuditsSourceCodeLocation `json:"sourceCodeLocation"`
+
+	// ClientHintIssueReason ...
+	ClientHintIssueReason AuditsClientHintIssueReason `json:"clientHintIssueReason"`
 }
 
 // AuditsInspectorIssueCode A unique identifier for the type of issue. Each type may use one of the
@@ -599,8 +769,8 @@ type AuditsWasmCrossOriginModuleSharingIssueDetails struct {
 type AuditsInspectorIssueCode string
 
 const (
-	// AuditsInspectorIssueCodeSameSiteCookieIssue enum const
-	AuditsInspectorIssueCodeSameSiteCookieIssue AuditsInspectorIssueCode = "SameSiteCookieIssue"
+	// AuditsInspectorIssueCodeCookieIssue enum const
+	AuditsInspectorIssueCodeCookieIssue AuditsInspectorIssueCode = "CookieIssue"
 
 	// AuditsInspectorIssueCodeMixedContentIssue enum const
 	AuditsInspectorIssueCodeMixedContentIssue AuditsInspectorIssueCode = "MixedContentIssue"
@@ -635,8 +805,17 @@ const (
 	// AuditsInspectorIssueCodeNavigatorUserAgentIssue enum const
 	AuditsInspectorIssueCodeNavigatorUserAgentIssue AuditsInspectorIssueCode = "NavigatorUserAgentIssue"
 
-	// AuditsInspectorIssueCodeWasmCrossOriginModuleSharingIssue enum const
-	AuditsInspectorIssueCodeWasmCrossOriginModuleSharingIssue AuditsInspectorIssueCode = "WasmCrossOriginModuleSharingIssue"
+	// AuditsInspectorIssueCodeGenericIssue enum const
+	AuditsInspectorIssueCodeGenericIssue AuditsInspectorIssueCode = "GenericIssue"
+
+	// AuditsInspectorIssueCodeDeprecationIssue enum const
+	AuditsInspectorIssueCodeDeprecationIssue AuditsInspectorIssueCode = "DeprecationIssue"
+
+	// AuditsInspectorIssueCodeClientHintIssue enum const
+	AuditsInspectorIssueCodeClientHintIssue AuditsInspectorIssueCode = "ClientHintIssue"
+
+	// AuditsInspectorIssueCodeFederatedAuthRequestIssue enum const
+	AuditsInspectorIssueCodeFederatedAuthRequestIssue AuditsInspectorIssueCode = "FederatedAuthRequestIssue"
 )
 
 // AuditsInspectorIssueDetails This struct holds a list of optional fields with additional information
@@ -644,8 +823,8 @@ const (
 // add a new optional field to this type.
 type AuditsInspectorIssueDetails struct {
 
-	// SameSiteCookieIssueDetails (optional) ...
-	SameSiteCookieIssueDetails *AuditsSameSiteCookieIssueDetails `json:"sameSiteCookieIssueDetails,omitempty"`
+	// CookieIssueDetails (optional) ...
+	CookieIssueDetails *AuditsCookieIssueDetails `json:"cookieIssueDetails,omitempty"`
 
 	// MixedContentIssueDetails (optional) ...
 	MixedContentIssueDetails *AuditsMixedContentIssueDetails `json:"mixedContentIssueDetails,omitempty"`
@@ -680,8 +859,17 @@ type AuditsInspectorIssueDetails struct {
 	// NavigatorUserAgentIssueDetails (optional) ...
 	NavigatorUserAgentIssueDetails *AuditsNavigatorUserAgentIssueDetails `json:"navigatorUserAgentIssueDetails,omitempty"`
 
-	// WasmCrossOriginModuleSharingIssue (optional) ...
-	WasmCrossOriginModuleSharingIssue *AuditsWasmCrossOriginModuleSharingIssueDetails `json:"wasmCrossOriginModuleSharingIssue,omitempty"`
+	// GenericIssueDetails (optional) ...
+	GenericIssueDetails *AuditsGenericIssueDetails `json:"genericIssueDetails,omitempty"`
+
+	// DeprecationIssueDetails (optional) ...
+	DeprecationIssueDetails *AuditsDeprecationIssueDetails `json:"deprecationIssueDetails,omitempty"`
+
+	// ClientHintIssueDetails (optional) ...
+	ClientHintIssueDetails *AuditsClientHintIssueDetails `json:"clientHintIssueDetails,omitempty"`
+
+	// FederatedAuthRequestIssueDetails (optional) ...
+	FederatedAuthRequestIssueDetails *AuditsFederatedAuthRequestIssueDetails `json:"federatedAuthRequestIssueDetails,omitempty"`
 }
 
 // AuditsIssueID A unique id for a DevTools inspector issue. Allows other entities (e.g.
@@ -727,7 +915,7 @@ type AuditsGetEncodedResponse struct {
 	Encoding AuditsGetEncodedResponseEncoding `json:"encoding"`
 
 	// Quality (optional) The quality of the encoding (0-1). (defaults to 1)
-	Quality float64 `json:"quality,omitempty"`
+	Quality *float64 `json:"quality,omitempty"`
 
 	// SizeOnly (optional) Whether to only return the size information (defaults to false).
 	SizeOnly bool `json:"sizeOnly,omitempty"`
