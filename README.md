@@ -48,7 +48,7 @@ Call `Init()` function with a `Config` object created with the `NewConfig()` fun
 	res, err := wapp.Analyze(url)
 
 ```
-### Using the cmd
+### Using under commandline
 You can build the cmd using the commande :
 `go build -o gowap cmd/gowap/main.go`
 
